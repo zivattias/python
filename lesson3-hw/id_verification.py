@@ -1,28 +1,20 @@
-id_num: str = '04798562'
-num_list: list = []  # [0, 4, 7, 9, 8, 5, 6, 2]
-num_strength: list = [1, 2, 1, 2, 1, 2, 1, 2]
-num_multi: list = []  # [0, 8, 7, 18, 8, 10, 6, 4]
-num_sum: list = []  # [0, 8, 7, 1+8, 8, 1+0, 6, 4]
-
-for i in range(len(id_num)):
-    num_list.append(int(id_num[i]))
-
-for j in range(len(num_list)):
-    num_multi.append(num_strength[j] * num_list[j])
-
-for k in range(len(num_multi)):
-    if num_multi[k] >= 10:
-        num_sum.append(int(str(num_multi)[k][0]) + int(str(num_multi)[k][1]))
+def last_id_digit(id_num: str) -> str:
+    num_strength: list = [1, 2, 1, 2, 1, 2, 1, 2]
+    num_multi: list = []
+    num_sum_list: list = []
+    for i in range(len(id_num)):
+        num_multi.append(num_strength[i] * int(id_num[i]))
+        if num_multi[i] >= 10:
+            num_sum_list.append(num_multi[i] % 10 + num_multi[i] // 10)
+        else:
+            num_sum_list.append(num_multi[i])
+    digits_sum: int = sum(num_sum_list)
+    if digits_sum % 10 != 0:
+        last_digit: int = 10 - (digits_sum % 10)
     else:
-        num_sum.append(num_multi[k])
+        last_digit = 0
+    full_id = str(id_num) + str(last_digit)
+    return full_id
 
-
-print(num_list)
-print(num_multi)
-
-# def id_verification(num: str) -> int:
-#     num_list.append(num.split(''))
-#     for i in num_list:
-#         nums_sum.append(num_list[i])
-#         for idx, figure in enumerate(nums_sum):
-#
+if __name__ == '__main__':
+    print(last_id_digit(input('Enter your ID number without last digit: ')))
