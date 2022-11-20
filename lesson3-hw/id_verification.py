@@ -1,3 +1,4 @@
+import random
 # Function to determine last digit in ID number
 def last_id_digit(id_num: str) -> str:
     # Digits strength assorted in a list
@@ -21,6 +22,7 @@ def last_id_digit(id_num: str) -> str:
     full_id = "Your full ID number is: " + str(id_num) + str(last_digit)
     return full_id
 
+
 # The application:
 # Shows the instructions on how to use it.
 # The application will randomly fit the remaining numbers
@@ -29,14 +31,24 @@ def last_id_digit(id_num: str) -> str:
 # More than 8 digits entered ⇒ application will reference only first 8
 
 # Program greeting message:
-print("Welcome to Ziv's ID generator. The program will generate a valid ID number according to your input.\n"
-      "If can enter how many digits you want, ranging from 0 to 8 digits.\n"
-      "Regardless of how many digits you entered - the program will complete the sequence to match valid Israeli ID.\n"
-      "Let's start!")
-# Initial user input:
-app_id: str = input('Enter your input: ')
-how_many_digits: int = len(app_id)
+def greeting_message():
+    return print("Welcome to Ziv's ID generator. The program will generate a valid ID number according to your input.\n"
+                 "You can enter how many digits you want, ranging from 0 to 8 digits.\n"
+                 "Regardless of how many digits you entered - the program will complete the sequence to match valid "
+                 "Israeli ID.\n"
+                 "Let's start!")
 
+# Randomize digits:
+def randomize(app_id: str) -> str:
+    how_many_digits: int = 8 - len(app_id)
+    for n in range(how_many_digits):
+        app_id += (str(random.randint(1, how_many_digits)))
+    return app_id
 
 if __name__ == '__main__':
     print(last_id_digit(input('Enter your ID number without last digit: ')))
+
+    # ID Generator bonus:
+    greeting_message()
+    print(last_id_digit(randomize(input('Enter an ID number from 0 to 8 digits: '))))
+
