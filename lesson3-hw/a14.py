@@ -1,14 +1,8 @@
-# data = [0, 1]
-#
-# for x in data:
-#     for y in data:
-#         print(x, y)
-
+# complexity = n^2
 nums: list = [6, 2, 4, 3]
 target: int = 7
 output: list = []
 
-# complexity n^2
 for i in nums:
     if len(output) == 2:
         break
@@ -19,3 +13,12 @@ for i in nums:
 print(output)
 
 # complexity < n^2
+nums2: list = [6, 2, 4, 3]
+target2: int = 7
+indices: dict = {}
+
+for i, num in enumerate(nums2):
+    if target2 - num in indices:
+        print([indices[target - num], i])
+    else:
+        indices[num] = i
