@@ -1,7 +1,12 @@
+# Function to determine last digit in ID number
 def last_id_digit(id_num: str) -> str:
+    # Digits strength assorted in a list
     num_strength: list = [1, 2, 1, 2, 1, 2, 1, 2]
+    # ID number digits multiplied by strength, in a list
     num_multi: list = []
+    # Digit sums for two-digit numbers
     num_sum_list: list = []
+
     for i in range(len(id_num)):
         num_multi.append(num_strength[i] * int(id_num[i]))
         if num_multi[i] >= 10:
