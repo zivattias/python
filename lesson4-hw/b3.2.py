@@ -1,6 +1,6 @@
 # Write a program that can execute 2 actions (according to user choice): insert and search.
 # Insert asks the user to insert a word and stores it.
-# Search asks for a letter and a number. From all the words that have been stored before
+# Search asks for a letter and a number. From all the words that have been stored
 # it displays only words in which the provided letter appeared exactly number times.
 # Divide the program into functions.
 
