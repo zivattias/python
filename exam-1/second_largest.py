@@ -1,7 +1,3 @@
-# Write a number that receives a list of numbers, and finds the second-largest number
-
-# list_range = int(input("Enter total amount of numbers to be given: "))
-
 def second_largest():
     _l = list()
     while True:
@@ -24,13 +20,3 @@ def second_largest():
     return _l[-2]
 
 print(f'Second largest number is: {second_largest()}')
-
-# for a in range(list_range):
-#     b = input("Enter a number: ")
-#     if not b.isdigit():
-#         print(f'You entered {b}. Please use digits only!')
-#     else:
-#         a_li.append(b)
-#         a_li.sort()
-
-# print(f"Second largest number: {a_li[-2]}")

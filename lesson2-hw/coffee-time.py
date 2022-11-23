@@ -1,10 +1,10 @@
 # Provided coffee types
 coffee_types: list = ['Espresso', 'Doppio', 'Lungo', 'Ristretto', 'Macchiato',
-                    'Corretto', 'Con Panina', 'Romano', 'Cappuccino', 'Americano',
-                    'Cafe Latte', 'Flat White', 'Marocchino', 'Mocha', 'Bicerin',
-                    'Breve', 'Raf Coffee', 'Mead Raf', 'Vienna Coffee', 'Chocolate Milk',
-                    'Latte Macchiato', 'Glace', 'Freddo', 'Irish Coffee', 'Frappe',
-                    'Cappuccino Freddo', 'Caramel Frappe', 'Espresso Laccino']
+                      'Corretto', 'Con Panina', 'Romano', 'Cappuccino', 'Americano',
+                      'Cafe Latte', 'Flat White', 'Marocchino', 'Mocha', 'Bicerin',
+                      'Breve', 'Raf Coffee', 'Mead Raf', 'Vienna Coffee', 'Chocolate Milk',
+                      'Latte Macchiato', 'Glace', 'Freddo', 'Irish Coffee', 'Frappe',
+                      'Cappuccino Freddo', 'Caramel Frappe', 'Espresso Laccino']
 
 # Input validation for 'time' hh:mm
 hours, minutes = None, None
@@ -104,5 +104,5 @@ for i in range(friends):
             ordered_coffees.append(coffee_types[(hours + minutes + new_start) - 1])
     i += 1
 
-print(f'User coffee: {coffee_types[hours-1]}\n'
+print(f'User coffee: {coffee_types[hours - 1]}\n'
       f'Friends coffee: {ordered_coffees[1::]}')

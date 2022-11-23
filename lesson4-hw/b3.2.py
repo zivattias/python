@@ -27,9 +27,9 @@ def main_menu():
     while True:
         choice: str = input('Enter your choice (case-insensitive): ').upper()
         if choice == 'INSERT':
-            return insert_words()
+            insert_words()
         elif choice == 'SEARCH':
-            return search_words()
+            search_words()
         else:
             print('Wrong input. Please type either INSERT or SEARCH.')
 
@@ -39,7 +39,7 @@ def insert_words():
     while True:
         s = input("Please insert a word to store, '$' to return to the menu: ").lower()
         if s == '$':
-            return main_menu()
+            main_menu()
         elif not s.isalpha():
             print('Wrong input. Please use alphabetical words.')
         else:
@@ -52,14 +52,14 @@ def search_words():
     s_list: list = []
     print('>> SEARCH:')
     while True:
-        query_letter = input('Enter a letter and a times number to search (ex: B): ').lower()
+        query_letter = input('Enter a letter to search (ex: B): ').lower()
         query_number = input('Enter a times number to search (ex: 3): ')
         if not (query_letter.isalpha() or query_number.isdigit()):
             print('Use alphabetical characters for letter and digits for number, please.')
         else:
             break
     for item in i_list:
-        if str(item).count(str(query_letter)) == int(query_number):
+        if item.count(str(query_letter)) == int(query_number):
             s_list.append(item)
     print(f'> YOUR QUERY ({query_letter.upper()}, {query_number}): {s_list}')
     main_menu()
