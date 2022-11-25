@@ -248,7 +248,7 @@ def lottery():
 
 
 def flow():
-    # greetings()
+    greetings()
     customer_info()
     flight_info()
     choose_class()
