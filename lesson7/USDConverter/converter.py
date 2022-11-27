@@ -33,10 +33,3 @@ class Converter:
     def display_amount_USD(self, currency: str, amount_to_convert: int):
         amount_in_usd = amount_to_convert / self.rates[currency]
         return f'{amount_to_convert} {currency} = {amount_in_usd} USD'
-
-
-
-
-
-
-
