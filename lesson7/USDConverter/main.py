@@ -3,6 +3,9 @@ from converter import *
 if __name__ == '__main__':
     converter = Converter()
 
+    converter.add_rate("YEN", 113.73)
+    converter.add_rate("NIS", 3.14)
+    converter.add_rate("EUR", 0.89)
     print(converter.display_rate("YEN"))
     print(converter.display_amount_currency("YEN", 1))
     print(converter.display_amount_USD("YEN", 30000))

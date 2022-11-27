@@ -1,11 +1,7 @@
 class Converter:
 
     def __init__(self):
-        self.rates = {
-            "NIS": 3.14,
-            "YEN": 113.73,
-            "EUR": 0.89
-        }
+        self.rates = {}
         self.USD_rates = {}
 
     def display_all_rates_to_USD(self) -> dict:
