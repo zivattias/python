@@ -6,7 +6,6 @@ class Converter:
             "YEN": 113.73,
             "EUR": 0.89
         }
-
         self.USD_rates = {}
 
     def display_all_rates_to_USD(self) -> dict:
@@ -15,7 +14,6 @@ class Converter:
     def display_all_rates_from_USD(self) -> dict:
         for k, v in self.rates.items():
             self.USD_rates[k] = 1 / v
-
         return self.USD_rates
 
     def add_rate(self, new_currency: str, value: int | float):
