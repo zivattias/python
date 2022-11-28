@@ -82,6 +82,10 @@ class Bank:
             error = f"ERROR: Given customer ID ({customer_id}) doesn't own any accounts."
             return print(error)
 
+    # SHOW ACCOUNT HISTORY LOG:
+    def show_log(self, account_id: int) -> None:
+        return Account.show_log(self.bank_accounts[account_id]["account_details"])
+
     # DEPOSIT TO ACCOUNT: TODO: Account number, Amount Deposit currency type, Log in Transactions
     def deposit(self, account_id: int, amount: int, currency: str):
         currency = currency.upper()

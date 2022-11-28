@@ -1,4 +1,4 @@
-import bank
+import pprint
 from datetime import datetime
 now = datetime.now()
 date_string = now.strftime("%d/%m/%Y")
@@ -6,10 +6,12 @@ date_string_split = date_string.split("/")
 month = date_string_split[1]
 year = date_string_split[2]
 
+available_log_types = ['deposit', 'withdrawal', 'transfer_to', 'transfer_in', 'conversion']
+basic_log = available_log_types[0:2]  # - Basic logs are made of str & int
+medium_log = available_log_types[2:4]  # - Medium logs are lists
+advanced_log = available_log_types[-1]  # - Advanced logs are dictionaries
+
 class Account:
-
-    available_log_types = ['deposit', 'withdrawal', 'transfer_to', 'transfer_in', 'conversion']
-
     def __init__(self, account_id: int, credit_limit: int, is_foreign_currency: bool):
         self.account_id = account_id
         self.credit_limit = credit_limit
@@ -37,16 +39,24 @@ class Account:
     def __repr__(self):
         return f"<ACCOUNT: {self.account_id}>"
 
-    # Log function to create db of performed actions in account
-    def log_transaction(self, tr_type: str, value: int):
-        if tr_type not in self.available_log_types:
-            error = f"ERROR: Failed to log unknown transaction type ({type})."
-            print(error)
+    # LOG ACCOUNT ACTIONS IN DATABASE
+    def log_transaction(self, tr_type: str, amount: int):
+        # if tr_type not in self.available_log_types:
+        #     error = f"ERROR: Failed to log unknown transaction type ({type})."
+        #     print(error)
         if date_string not in self.transaction_db.keys():
             self.transaction_db[date_string] = {}
         if tr_type not in self.transaction_db[date_string].keys():
-            self.transaction_db[date_string][tr_type] = value
+            self.transaction_db[date_string][tr_type] = amount
+        else:
+            if tr_type in basic_log:
+                self.transaction_db[date_string][tr_type] += amount
+            # if tr_type in self.medium_log:
+            #     self.transaction_db[date_string][tr_type] = []
 
+    # SHOW ACCOUNT LOGS
+    def show_log(self):
+        pprint.pprint(self.transaction_db)
 
 
 

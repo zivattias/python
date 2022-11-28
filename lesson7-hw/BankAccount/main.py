@@ -37,5 +37,8 @@ if __name__ == '__main__':
     # Show balances post-deposit:
     print(bank.bank_accounts[1001]['account_details'])
     print(bank.bank_accounts[1002]['account_details'])
+    # Show log with deposits:
+    bank.show_log(1001)
+
 
 
