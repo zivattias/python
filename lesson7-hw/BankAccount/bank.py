@@ -104,6 +104,8 @@ class Bank:
                 self.bank_accounts[account_id]['account_details'].balance[0] += amount
             if currency == "USD":
                 self.bank_accounts[account_id]['account_details'].balance[1] += amount
+            # Execute transaction log function within Account:
+            Account.log_transaction(self.bank_accounts[account_id]['account_details'], 'deposit', amount)
 
 
 

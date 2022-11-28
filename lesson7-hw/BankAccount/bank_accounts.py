@@ -38,14 +38,14 @@ class Account:
         return f"<ACCOUNT: {self.account_id}>"
 
     # Log function to create db of performed actions in account
-    # def log_transaction(self, tr_type: str, value: int):
-    #     if tr_type not in self.available_log_types:
-    #         error = f"ERROR: Failed to log unknown transaction type ({type})."
-    #         print(error)
-    #     if date_string not in self.transaction_db.keys():
-    #         self.transaction_db[date_string] = {}
-    #     if tr_type not in self.transaction_db[date_string].keys():
-    #         self.transaction_db[date_string][tr_type] = value
+    def log_transaction(self, tr_type: str, value: int):
+        if tr_type not in self.available_log_types:
+            error = f"ERROR: Failed to log unknown transaction type ({type})."
+            print(error)
+        if date_string not in self.transaction_db.keys():
+            self.transaction_db[date_string] = {}
+        if tr_type not in self.transaction_db[date_string].keys():
+            self.transaction_db[date_string][tr_type] = value
 
 
 
