@@ -187,9 +187,9 @@ class Bank:
                 else:
                     # Perform transfer:
                     self.bank_accounts[origin]['account_details'].balance[i][currency] -= amount
-                    Account.log_transaction(self.bank_accounts[origin]['account_details'], 'transfer-to', currency, amount)
+                    Account.log_transaction(self.bank_accounts[origin]['account_details'], 'transfer-to', currency, amount, destination)
                     self.bank_accounts[destination]['account_details'].balance[i][currency] += amount
-                    Account.log_transaction(self.bank_accounts[destination]['account_details'], 'transfer-from', currency, amount)
+                    Account.log_transaction(self.bank_accounts[destination]['account_details'], 'transfer-from', currency, amount, origin)
                     return print(f"TRANSFER COMPLETED: From #{destination} To #{origin}, {amount} {currency}")
 
 

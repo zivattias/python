@@ -53,12 +53,12 @@ class Account:
         return f"<ACCOUNT: {self.account_id}>"
 
     # LOG ACCOUNT ACTIONS IN DATABASE
-    def log_transaction(self, tr_type: str, currency: str, amount: int):
+    def log_transaction(self, tr_type: str, currency: str, amount: int, account: int = 'SELF'):
         if date_string not in self.transaction_db.keys():
             self.transaction_db[date_string] = {}
         if tr_type not in self.transaction_db[date_string].keys():
             self.transaction_db[date_string][tr_type] = []
-        self.transaction_db[date_string][tr_type].append({currency: amount})
+        self.transaction_db[date_string][tr_type].append([{currency: amount}, account])
 
 
     # SHOW ACCOUNT LOGS
