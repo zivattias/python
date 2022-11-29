@@ -54,17 +54,12 @@ class Account:
 
     # LOG ACCOUNT ACTIONS IN DATABASE
     def log_transaction(self, tr_type: str, currency: str, amount: int):
-        # if tr_type not in self.available_log_types:
-        #     error = f"ERROR: Failed to log unknown transaction type ({type})."
-        #     print(error)
         if date_string not in self.transaction_db.keys():
             self.transaction_db[date_string] = {}
         if tr_type not in self.transaction_db[date_string].keys():
             self.transaction_db[date_string][tr_type] = []
         self.transaction_db[date_string][tr_type].append({currency: amount})
 
-            # if tr_type in self.medium_log:
-            #     self.transaction_db[date_string][tr_type] = []
 
     # SHOW ACCOUNT LOGS
     def show_log(self):

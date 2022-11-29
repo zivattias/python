@@ -50,5 +50,20 @@ if __name__ == '__main__':
     bank.show_log(1002)     # - Displays logs for account 1002.
     bank.show_log(1003)     # - Error: Unknown account, won't display.
 
+    # Inter-account transfers:
+    bank.transfer(1001, 1002, "ILS", 4000)
+    print(bank.bank_accounts[1001]['account_details'])  # - Will display account details for account 1001.
+    print(bank.bank_accounts[1002]['account_details'])  # - Will display account details for account 1002.
+    bank.show_log(1001)     # - Displays logs for account 1001.
+    bank.show_log(1002)     # - Displays logs for account 1002.
+    bank.transfer(1001, 1003, "ILS", 4000)  # - Error: Account 1003 not found.
+    bank.transfer(1001, 1002, "EUR", 4000)  # - Error: 'EUR' unsupported by bank.
+    bank.transfer(1002, 1001, "USD", 1)     # - Error: Origin account doesn't support foreign currency.
+    bank.transfer(1001, 1002, "USD", 1)     # - Error: Destination account doesn't support foreign currency.
+    bank.transfer(1001, 1002, "ILS", -1)    # - Error: Negative amount.
+    bank.transfer(1001, 1001, "ILS", 1)     # - Error: Self transferring.
+    bank.show_log(1001)  # - Displays logs for account 1001.
+    bank.show_log(1002)  # - Displays logs for account 1002.
+
 
 

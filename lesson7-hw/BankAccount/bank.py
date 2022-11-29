@@ -117,7 +117,7 @@ class Bank:
             # Execute transaction log function within Account:
             Account.log_transaction(self.bank_accounts[account_id]['account_details'], 'deposit', currency, amount)
 
-    # WITHDRAW:
+    # WITHDRAW FROM ACCOUNT:
     def withdraw(self, account_id: int, amount: int, currency: str):
         currency = currency.upper()
         if account_id not in self.bank_accounts.keys():
@@ -147,8 +147,53 @@ class Bank:
             # Execute transaction log function within Account:
             Account.log_transaction(self.bank_accounts[account_id]['account_details'], 'withdraw', currency, amount)
 
+    # INTER-ACCOUNT TRANSFER:
+    def transfer(self, origin: int, destination: int, currency: str, amount: int):
+        currency = currency.upper()
+        # Check for same-account transfer:
+        if destination == origin:
+            error = f"ERROR: Transferring to yourself is impossible."
+            return print(error)
+        # No negative amounts:
+        if amount <= 0:
+            error = f"ERROR: Amount must be positive."
+            return print(error)
+        # Check if origin account has sufficient funds:
+        for i, currency_balance in enumerate(self.bank_accounts[origin]['account_details'].balance):
+            if currency in currency_balance.keys() and amount > currency_balance[currency]:
+                error = f"ERROR: Insufficient funds to transfer."
+                return print(error)
+            # If it does:
+            else:
+                # Check if either of the accounts are valid accounts in db:
+                if (destination or origin) not in self.bank_accounts.keys():
+                    error = f"TRANSFER FAILED: Account ID ({destination | origin}) not found."
+                    return print(error)
+                # Check if currency is valid:
+                if currency not in self.available_currencies:
+                    error = f"ERROR: Unsupported currency: {currency}\n" \
+                            f"Available currencies: {self.available_currencies}"
+                    return print(error)
+                # If it's a foreign currency:
+                if currency != "ILS":
+                    # Check if destination account supports foreign currency in case of such transfer:
+                    if self.bank_accounts[destination]['account_details'].is_foreign_currency is False:
+                        error = f"ERROR: Destination account {destination} doesn't support foreign currencies."
+                        return print(error)
+                    # Check if origin account supports foreign currency:
+                    if self.bank_accounts[origin]['account_details'].is_foreign_currency is False:
+                        error = f"ERROR: Origin account {origin} doesn't support foreign currencies."
+                        return print(error)
+                else:
+                    # Perform transfer:
+                    self.bank_accounts[origin]['account_details'].balance[i][currency] -= amount
+                    Account.log_transaction(self.bank_accounts[origin]['account_details'], 'transfer-to', currency, amount)
+                    self.bank_accounts[destination]['account_details'].balance[i][currency] += amount
+                    Account.log_transaction(self.bank_accounts[destination]['account_details'], 'transfer-from', currency, amount)
+                    return print(f"TRANSFER COMPLETED: From #{destination} To #{origin}, {amount} {currency}")
 
-# Implement the following methods:
-# transfer - transfer amount from one account to another
+
+
+
 # convert - convert specified amount from shekels to usd or vise versa inside the account if applicable. think about edge cases!
 # advanced: get cash flow per month and year - given month and year, return total sum of income and total sum of outcome to / from the account
