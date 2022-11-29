@@ -192,8 +192,6 @@ class Bank:
                     Account.log_transaction(self.bank_accounts[destination]['account_details'], 'transfer-from', currency, amount, origin)
                     return print(f"TRANSFER COMPLETED: From #{destination} To #{origin}, {amount} {currency}")
 
-
-
-
-# convert - convert specified amount from shekels to usd or vise versa inside the account if applicable. think about edge cases!
-# advanced: get cash flow per month and year - given month and year, return total sum of income and total sum of outcome to / from the account
+# TODO:
+    # convert - convert specified amount from shekels to usd or vise versa inside the account if applicable. think about edge cases!
+    # advanced: get cash flow per month and year - given month and year, return total sum of income and total sum of outcome to / from the account
