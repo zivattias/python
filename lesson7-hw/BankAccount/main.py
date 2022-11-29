@@ -26,7 +26,7 @@ if __name__ == '__main__':
     bank.display_owner_accounts(700803)  # - The owner (Dvir) has account 1002
     bank.display_owner_accounts(700804)  # - Error: The customer doesn't exist, no accounts to display
 
-    # Inter-accounts deposits:
+    # Deposits:
     bank.deposit(1001, 10_000, "ILS")   # - Deposit 10,000 ILS to account 1001
     bank.deposit(1002, 5_000, "ILS")    # - Deposit 5,000 ILS to account 1002
     bank.deposit(1001, 200, "USD")      # - Deposit 200 USD to account 1001
@@ -34,11 +34,18 @@ if __name__ == '__main__':
     bank.deposit(1003, 1, "ILS")        # - Error: Account 1003 doesn't exist
     bank.deposit(1001, -1, "ILS")       # - Error: Amount must be > 0
     bank.deposit(1001, 1, "EUR")        # - Error: Currency 'EUR' is unsupported by bank
-    # Show balances post-deposit:
-    print(bank.bank_accounts[1001]['account_details'])
-    print(bank.bank_accounts[1002]['account_details'])
-    # Show log with deposits:
-    bank.show_log(1001)
+
+    # Withdrawals:
+    bank.withdraw(1001, 200, "USD")     # - Withdraw 200 USD from account 1001
+
+    # Show balances of accounts:
+    print(bank.bank_accounts[1001]['account_details'])  # - Will display account details for account 1001.
+    print(bank.bank_accounts[1002]['account_details'])  # - Will display account details for account 1002.
+
+    # Show log of accounts:
+    bank.show_log(1001) # - Displays logs for account 1001.
+    bank.show_log(1002) # - Displays logs for account 1002.
+    bank.show_log(1003) # - Error: Unknown account, won't display.
 
 
 

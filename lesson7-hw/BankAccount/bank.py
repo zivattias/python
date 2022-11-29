@@ -6,6 +6,7 @@ class Bank:
     total_users = 0
     total_accounts = 0
     available_currencies = ["ILS", "USD"]
+    usd_rate = 3.43
 
     # INITIALIZE BANK:
     def __init__(self, bank_name: str, bank_branch: str):
@@ -83,10 +84,14 @@ class Bank:
             return print(error)
 
     # SHOW ACCOUNT HISTORY LOG:
-    def show_log(self, account_id: int) -> None:
-        return Account.show_log(self.bank_accounts[account_id]["account_details"])
+    def show_log(self, account_id: int) -> str | None:
+        if account_id not in self.bank_accounts.keys():
+            error = f"ERROR: Invalid account ({account_id}), no logs to display."
+            return print(error)
+        else:
+            return Account.show_log(self.bank_accounts[account_id]["account_details"])
 
-    # DEPOSIT TO ACCOUNT: TODO: Account number, Amount Deposit currency type, Log in Transactions
+    # DEPOSIT TO ACCOUNT:
     def deposit(self, account_id: int, amount: int, currency: str):
         currency = currency.upper()
         if account_id not in self.bank_accounts.keys():
@@ -98,45 +103,51 @@ class Bank:
         if currency not in self.available_currencies:
             error = f"ERROR: Currency type ({currency}) is not supported.\n" \
                     f"Available currencies: {self.available_currencies}"
-            print(error)
+            return print(error)
         if (currency != "ILS") and \
             (self.bank_accounts[account_id]['account_details'].is_foreign_currency is False):
             error = f"ERROR: Account ID ({account_id}) doesn't support foreign currency ({currency})."
             return print(error)
         else:
             if currency == "ILS":
-                self.bank_accounts[account_id]['account_details'].balance[0] += amount
+                self.bank_accounts[account_id]['account_details'].balance[0]['ILS'] += amount
             if currency == "USD":
-                self.bank_accounts[account_id]['account_details'].balance[1] += amount
+                self.bank_accounts[account_id]['account_details'].balance[1]['USD'] += amount
             # Execute transaction log function within Account:
-            Account.log_transaction(self.bank_accounts[account_id]['account_details'], 'deposit', amount)
+            Account.log_transaction(self.bank_accounts[account_id]['account_details'], 'deposit', currency, amount)
+
+    # WITHDRAW:
+    def withdraw(self, account_id: int, amount: int, currency: str):
+        currency = currency.upper()
+        if account_id not in self.bank_accounts.keys():
+            error = f"ERROR: Unknown account ID ({account_id}). Can't withdraw."
+            return print(error)
+        if amount <= 0:
+            error = f"ERROR: Withdraw amount ({amount}) must be a positive integer."
+            return print(error)
+        if currency not in self.available_currencies:
+            error = f"ERROR: Currency type ({currency}) is not supported.\n" \
+                    f"Available currencies: {self.available_currencies}"
+            print(error)
+        if (currency != "ILS") and \
+            (self.bank_accounts[account_id]['account_details'].is_foreign_currency is False):
+            error = f"ERROR: Account ID ({account_id}) doesn't support foreign currency ({currency})."
+            return print(error)
+        if amount > self.bank_accounts[account_id]['account_details'].balance[0]['ILS'] + \
+            self.bank_accounts[account_id]['account_details'].balance[1]['USD'] * self.usd_rate + \
+            self.bank_accounts[account_id]['account_details'].credit_limit:
+            error = f"ERROR: Your withdraw request is unsuccessful due to credit limitations. Try withdrawing less."
+            return error
+        else:
+            if currency == "ILS":
+                self.bank_accounts[account_id]['account_details'].balance[0]['ILS'] -= amount
+            if currency == "USD":
+                self.bank_accounts[account_id]['account_details'].balance[1]['USD'] -= amount
+            # Execute transaction log function within Account:
+            Account.log_transaction(self.bank_accounts[account_id]['account_details'], 'withdraw', currency, amount)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-# BankAccount should store the following data:
-# bank details (name, branch)
-# account number
-# account holder details (id, name, address, …).
-# Advanced: Allow multiple account holders
-# is account allowed to have usd balance or only shekels
-# Current shekel balance and usd balance if applicable
-# maximum credit limit (מסגרת משכורת) - how much the account can get into negative balance
-# transactions data - which action was performed when. transaction is an action performed on your account - deposit, withdrawal, transfer, conversion
-#
 # Implement the following methods:
-# deposit - add cash to account
-# withdraw - withdraw cash from account. Think about state consistency!
 # transfer - transfer amount from one account to another
 # convert - convert specified amount from shekels to usd or vise versa inside the account if applicable. think about edge cases!
 # get current balance

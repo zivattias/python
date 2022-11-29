@@ -17,40 +17,52 @@ class Account:
         self.credit_limit = credit_limit
         self.is_foreign_currency = is_foreign_currency
         self.transaction_db = {}
+        # DB EXAMPLE:
         # '28/11/2022': {
-        #       'deposit': 1000,
-        #       'withdrawal': 100,
-        #       'transfer_to': [account_id, 150, ILS]
-        #       'transfer_in': [account_id, 200, USD],
+        #       'deposit': {
+        #           'USD': [200],
+        #           'ILS': [1000]
+        #       },
+        #       'withdrawal': {
+        #           'USD': [200]
+        #       },
+        #       'transfer_to': {
+        #           account_id: [150, ILS]
+        #       }
+        #       'transfer_in': {
+        #           account_id: [200, USD]
+        #       },
         #       'conversion': {
         #           'from': [200, ILS],
         #           'to':   [58.25, USD],
-        #           'fee':  [4.5, ILS]
-        #       }
-        #    }
+        #           'fee':  [4.5, ILS],
+        #           'from': [200, ILS],
+        #           'to':   [58.25, USD],
+        #           'fee':  [4.5, ILS]],
+        #         }
+        #     }
         # }
-        self.balance = [0, 0]
+        self.balance = [{"ILS": 0}, {"USD": 0}]
 
     def __str__(self):
         details = f'- ACCOUNT #{self.account_id} -\nCREDIT LIMIT: {self.credit_limit:,} ILS\n' \
-                  f'BALANCES:\n{self.balance[0]:,} ILS'
-        return details if not self.is_foreign_currency else details + '\n' + f"{self.balance[1]:,} USD"
+                  f'BALANCES:\n{self.balance[0]["ILS"]:,} ILS'
+        return details if not self.is_foreign_currency else details + '\n' + f"{self.balance[1]['USD']:,} USD"
 
     def __repr__(self):
         return f"<ACCOUNT: {self.account_id}>"
 
     # LOG ACCOUNT ACTIONS IN DATABASE
-    def log_transaction(self, tr_type: str, amount: int):
+    def log_transaction(self, tr_type: str, currency: str, amount: int):
         # if tr_type not in self.available_log_types:
         #     error = f"ERROR: Failed to log unknown transaction type ({type})."
         #     print(error)
         if date_string not in self.transaction_db.keys():
             self.transaction_db[date_string] = {}
         if tr_type not in self.transaction_db[date_string].keys():
-            self.transaction_db[date_string][tr_type] = amount
-        else:
-            if tr_type in basic_log:
-                self.transaction_db[date_string][tr_type] += amount
+            self.transaction_db[date_string][tr_type] = []
+        self.transaction_db[date_string][tr_type].append({currency: amount})
+
             # if tr_type in self.medium_log:
             #     self.transaction_db[date_string][tr_type] = []
 
