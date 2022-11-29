@@ -33,7 +33,7 @@ class Bank:
         # If a user exists, display an error and conclude the function:
         else:
             error = f'ERROR: A user with the same customer ID ({customer_id}) already exists in the system.'
-            return error
+            return print(error)
 
     # CREATE ACCOUNT TO USER / ADD USER TO EXISTING ACCOUNT:
     def create_account(self, customer_id: int, account_id: int, credit_limit: int,
@@ -89,6 +89,7 @@ class Bank:
             error = f"ERROR: Invalid account ({account_id}), no logs to display."
             return print(error)
         else:
+            print(f"Account #{account_id} Transaction Log:")
             return Account.show_log(self.bank_accounts[account_id]["account_details"])
 
     # DEPOSIT TO ACCOUNT:
@@ -150,6 +151,4 @@ class Bank:
 # Implement the following methods:
 # transfer - transfer amount from one account to another
 # convert - convert specified amount from shekels to usd or vise versa inside the account if applicable. think about edge cases!
-# get current balance
-# get transactions per date
 # advanced: get cash flow per month and year - given month and year, return total sum of income and total sum of outcome to / from the account

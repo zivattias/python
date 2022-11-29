@@ -36,16 +36,19 @@ if __name__ == '__main__':
     bank.deposit(1001, 1, "EUR")        # - Error: Currency 'EUR' is unsupported by bank
 
     # Withdrawals:
-    bank.withdraw(1001, 200, "USD")     # - Withdraw 200 USD from account 1001
+    bank.withdraw(1001, 100, "USD")     # - Withdraw 200 USD from account 1001
+    bank.withdraw(1002, 500, "ILS")     # - Withdraw 500 ILS from account 1002.
+    bank.withdraw(1002, 50, "USD")      # - Error: Account 1002 doesn't have foreign currency permissions.
+    bank.withdraw(1002, -1, "ILS")      # - Error: Unable to withdraw negative amounts of money.
 
     # Show balances of accounts:
     print(bank.bank_accounts[1001]['account_details'])  # - Will display account details for account 1001.
     print(bank.bank_accounts[1002]['account_details'])  # - Will display account details for account 1002.
 
     # Show log of accounts:
-    bank.show_log(1001) # - Displays logs for account 1001.
-    bank.show_log(1002) # - Displays logs for account 1002.
-    bank.show_log(1003) # - Error: Unknown account, won't display.
+    bank.show_log(1001)     # - Displays logs for account 1001.
+    bank.show_log(1002)     # - Displays logs for account 1002.
+    bank.show_log(1003)     # - Error: Unknown account, won't display.
 
 
 
