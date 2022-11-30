@@ -16,7 +16,7 @@ class Bank:
                                       'account_details': Account}}
         # bank_accounts = {account_id: {owners: [customer_id, customer_id],
         #                               account_details: Account()}}
-        self.bank_customers = {int(): Person}
+        self.bank_customers: {int(): Person} = {}
         # bank_customers = {customer_id: Customer()}
 
     # ADD USER TO BANK:
@@ -191,6 +191,19 @@ class Bank:
                     self.bank_accounts[destination]['account_details'].balance[i][currency] += amount
                     Account.log_transaction(self.bank_accounts[destination]['account_details'], 'transfer-from', currency, amount, origin)
                     return print(f"TRANSFER COMPLETED: From #{destination} To #{origin}, {amount} {currency}")
+
+    def get_cashflow(self, account_id: int, month: int, year: int):
+        if account_id not in self.bank_accounts.keys():
+            error = f"ERROR: Account ID {account_id} not found. No cashflow to display."
+            print(error)
+        else:
+            for key in self.bank_accounts[account_id]["account_details"].transaction_db.keys():
+                m = key.split('/')[1]
+                y = key.split('/')[2]
+                if m == month and y == year:
+                    print(m, y)
+
+
 
 # TODO:
     # convert - convert specified amount from shekels to usd or vise versa inside the account if applicable. think about edge cases!

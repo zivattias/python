@@ -17,6 +17,12 @@ class Account:
         self.credit_limit = credit_limit
         self.is_foreign_currency = is_foreign_currency
         self.transaction_db = {}
+        self.cashflow = {
+            int(): [
+                ['Inbound', 0],
+                ['Outbound', 0]
+            ]
+        }
         # DB EXAMPLE:
         # '28/11/2022': {
         #       'deposit': {

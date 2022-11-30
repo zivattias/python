@@ -65,5 +65,7 @@ if __name__ == '__main__':
     bank.show_log(1001)  # - Displays logs for account 1001.
     bank.show_log(1002)  # - Displays logs for account 1002.
 
+    bank.get_cashflow(1001, "11", "2022")
+
 
 
