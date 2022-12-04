@@ -56,15 +56,17 @@ class Card:
             self.__rides_log_by_date[date] += 1
         self.__rides_log_by_date[date] = 1
 
-    def get_rides_by_type(self):
+    def get_rides_by_type(self) -> dict:
         return self.__rides_log_by_type
 
-    def get_rides_by_date(self):
+    def get_rides_by_date(self) -> dict:
         return self.__rides_log_by_date
 
-    def ride(self, km: int, date: str):
-
+    def ride(self, km: int, date: str) -> bool:
+        # Date formatting:
         date_format = datetime.datetime.strptime(date, "%d-%m-%Y")
+
+        # Validations:
         if self.get_balance() < self.SHORT_RIDE_FEE:
             print("Insufficient funds for minimum ride fee.")
             return False
@@ -75,14 +77,21 @@ class Card:
             print("Can't execute a ride for a retroactive datetime.")
             return False
 
-        if self.SHORT_RIDE_LENGTH[0] < km <= self.SHORT_RIDE_LENGTH[1]:
+        # Check and declare ride type:
+        if self.__balance >= self.SHORT_RIDE_FEE and self.SHORT_RIDE_LENGTH[0] < km <= self.SHORT_RIDE_LENGTH[1]:
             self.deduct_balance(self.SHORT_RIDE_FEE)
-            ride_type = "SHORT"
-        if self.MEDIUM_RIDE_LENGTH[0] < km <= self.MEDIUM_RIDE_LENGTH[1]:
+            ride_type: str = "SHORT"
+        elif self.__balance >= self.MEDIUM_RIDE_FEE and self.MEDIUM_RIDE_LENGTH[0] < km <= self.MEDIUM_RIDE_LENGTH[1]:
             self.deduct_balance(self.MEDIUM_RIDE_FEE)
-            ride_type = "MEDIUM"
-        else:
+            ride_type: str = "MEDIUM"
+        elif self.__balance >= self.LONG_RIDE_FEE:
             self.deduct_balance(self.LONG_RIDE_FEE)
-            ride_type = "LONG"
+            ride_type: str = "LONG"
+        else:
+            print('Insufficient balance to given ride type.')
+            return False
+
+        # Log ride:
         self.log_ride_by_type(ride_type)
         self.log_ride_by_date(date_format)
+        return True
