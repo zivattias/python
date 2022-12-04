@@ -62,7 +62,8 @@ class Card:
     def get_rides_by_date(self):
         return self.__rides_log_by_date
 
-    def ride(self, km: int, date: str) -> str | bool:
+    def ride(self, km: int, date: str):
+
         date_format = datetime.datetime.strptime(date, "%d-%m-%Y")
         if self.get_balance() < self.SHORT_RIDE_FEE:
             print("Insufficient funds for minimum ride fee.")
@@ -73,13 +74,15 @@ class Card:
         if date_format < datetime.date.today():
             print("Can't execute a ride for a retroactive datetime.")
             return False
+
         if self.SHORT_RIDE_LENGTH[0] < km <= self.SHORT_RIDE_LENGTH[1]:
             self.deduct_balance(self.SHORT_RIDE_FEE)
-            self.log_ride_by_type("SHORT")
+            ride_type = "SHORT"
         if self.MEDIUM_RIDE_LENGTH[0] < km <= self.MEDIUM_RIDE_LENGTH[1]:
             self.deduct_balance(self.MEDIUM_RIDE_FEE)
-            self.log_ride_by_type("MEDIUM")
+            ride_type = "MEDIUM"
         else:
             self.deduct_balance(self.LONG_RIDE_FEE)
-            self.log_ride_by_type("LONG")
+            ride_type = "LONG"
+        self.log_ride_by_type(ride_type)
         self.log_ride_by_date(date_format)
