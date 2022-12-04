@@ -1,7 +1,7 @@
 import datetime
 
-
 class Card:
+
     SHORT_RIDE_LENGTH: list[int] = [0, 15]
     SHORT_RIDE_FEE: float = 5.5
 
@@ -17,10 +17,10 @@ class Card:
         #   log: {SHORT_RIDE: 10,
         #         MEDIUM_RIDE: 5,
         #         LONG_RIDE: 3}
-        self.__rides_log_by_type: dict[str, datetime] = dict()
+        self.__rides_log_by_type: dict[str, int] = dict()
         #   log: {4/12/2022: 4,
         #         5/12/2022: 3}
-        self.__rides_log_by_date: dict[datetime: int] = dict()
+        self.__rides_log_by_date: dict[datetime.date: int] = dict()
 
     def get_holder_id(self) -> str:
         return self.__holder_id
