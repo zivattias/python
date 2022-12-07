@@ -1,4 +1,4 @@
-import random
+# from reservations import Reservation
 from datetime import datetime, timedelta
 
 class Table:
@@ -13,6 +13,7 @@ class Table:
         self.is_available = True
         self.reservation_time: datetime | None = None
         self.reservation_limit: datetime | None = None
+        # self.reservations: list[Reservation] = list()
 
     # VISUAL PRESENTATION OF 'TABLE':
     def __str__(self):
@@ -29,17 +30,12 @@ class Table:
                f"TIME-LEFT: {datetime.now() - self.reservation_time}>"
 
     # Reserve a table as of now:
-    def reserve(self):
+    def reserve(self, date: datetime.date, time: datetime.time):
+        # reservation = Reservation(date, time)
         self.reservation_time = datetime.now()
         self.reservation_limit = self.reservation_time + self.RESERVATION_DURATION
         print(f"Table #{self.table_id} has been reserved on: {self.reservation_time}.")
         self.is_available = False
-
-    # Release a table immediately:
-    def release(self):
-        self.reservation_time = None
-        self.reservation_limit = None
-        self.is_available = True
 
     # Get tables time limit:
     def get_tables_limit(self):

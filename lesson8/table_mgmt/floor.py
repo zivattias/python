@@ -43,14 +43,19 @@ class Floor:
         return sorted(available_tables, key=lambda t: t[1])
 
     # Reserve a table for guests num:
-    def reserve(self, table_id: int, guests: int):
+    def reserve(self, table_id: int, guests: int, date: datetime.date, time: datetime.time):
         if table_id not in self.tables_dict:
             print(f"Table ID {table_id} not found.")
             return False
         if guests > self.tables_dict[table_id].capacity:
             print(f"Table {table_id} doesn't have enough seats to accommodate {guests} guests.")
             return False
-        self.tables_dict[table_id].reserve()
+        for reservation in self.tables_dict[table_id].reservations:
+            if reservation.date is None:
+                self.tables_dict[table_id].reserve(date, time)
+            # TODO: if reservation.date == date
+
+        # self.tables_dict[table_id].
         self.tables_dict[table_id].occupied_seats = guests
 
     # Release a table by table ID:
@@ -61,7 +66,9 @@ class Floor:
         if self.tables_dict[table_id].is_available is True:
             print(f"Table {table_id} is already free.")
             return False
-        self.tables_dict[table_id].release()
+        self.tables_dict[table_id].is_available = True
+        self.tables_dict[table_id].reservation_time = None
+        self.tables_dict[table_id].reservation_limit = None
 
     # Get time left until for given table ID availability:
     def time_left_for_table(self, table_id: int) -> timedelta | bool:
