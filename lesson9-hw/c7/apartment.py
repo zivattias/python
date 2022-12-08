@@ -62,12 +62,11 @@ def get_agency_fee(apartment: Apartment | ForRent | ForSale) -> float | str:
         return error
 
 
-def set_deal_status(apartment: ForSale | ForRent) -> bool:
+def _set_deal_status(apartment: ForSale | ForRent):
     apartment._deal_state = False
-    return True
 
 
-def close_deal(apartment: ForSale | ForRent) -> bool:
-    if not isinstance(apartment, ForSale) or not isinstance(apartment, ForRent):
-        return False
-    return set_deal_status(apartment)
+def close_deal(apartment: Apartment | ForSale | ForRent) -> bool | None:
+    if isinstance(apartment, ForSale) or isinstance(apartment, ForRent):
+        return _set_deal_status(apartment)
+    return None

@@ -19,9 +19,12 @@ if __name__ == '__main__':
     print(f"{get_agency_fee(apt3):,} ILS")
 
     print(apt3.is_for_sale())
-    set_deal_status(apt3)
+    close_deal(apt3)
     print(apt3.is_for_sale())
 
     print(apt2.is_for_rent())
-    set_deal_status(apt2)
+    close_deal(apt2)
     print(apt2.is_for_rent())
+
+    print(close_deal(apt))
+
