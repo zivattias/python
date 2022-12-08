@@ -70,7 +70,7 @@ def create_new_csv(new_file_name: str):
         # Handle the last year:
         with open(new_file_name, 'a') as new_file:
             row_dict: dict[str, int | float] = {
-                fieldnames[0]: previous_year,
+                fieldnames[0]: current_year,
                 fieldnames[1]: total_price / line_counter,
                 fieldnames[2]: min_price,
                 fieldnames[3]: max_price,
