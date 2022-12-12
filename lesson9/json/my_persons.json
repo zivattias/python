@@ -1,1 +1,17 @@
-[{"name": "a", "year": "a", "person_id": "a"}, {"name": "a", "year": "a", "person_id": "a"}, {"name": "a", "year": "a", "person_id": "a"}]
+[
+  {
+    "name": "a",
+    "year": "a",
+    "person_id": "a"
+  },
+  {
+    "name": "a",
+    "year": "a",
+    "person_id": "a"
+  },
+  {
+    "name": "a",
+    "year": "a",
+    "person_id": "a"
+  }
+]
