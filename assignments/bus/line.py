@@ -19,7 +19,6 @@ class Line:
                f"Destination: {self.destination}\n" \
                f"Stops: {self.stops}\n" \
                f"Scheduled Rides:\n" \
-               f"----------------\n" \
                f"{self.rides}\n"
 
     def __repr__(self):
@@ -30,9 +29,7 @@ class Line:
         ride_id = random.randint(1000, 9999)
         while ride_id in self.rides:
             ride_id = random.randint(1000, 9999)
-        time_format = "%H:%M"
-        departure_object = datetime.strptime(departure_time, time_format)
-        arrival_object = datetime.strptime(arrival_time, time_format)
-        ride = Ride(ride_id, departure_object, arrival_object, driver)
+        departure_object = datetime.strptime(departure_time, "%H:%M").time()
+        ride = Ride(ride_id, departure_object, arrival_time, driver)
         self.rides[ride_id] = ride
-        return True
+        return ride_id

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from assignments.bus.line import Line
+from assignments.bus.ride import Ride
 from exceptions.exceptions import *
 
 
@@ -12,6 +13,8 @@ class BusCompany:
         self.lines_by_origin: dict[str: Line] = {}
         self.lines_by_destination: dict[str: Line] = {}
         self.lines_by_stops: dict[str: Line] = {}
+
+        self.rides: dict[int: Ride] = {}
 
     @staticmethod
     def stops_converter(stops: str) -> list:
@@ -79,7 +82,8 @@ class BusCompany:
 
     def _add_ride_to_line(self, line_num, departure_time: datetime.time, arrival_time: datetime.time, driver: str):
         line = self._get_line(line_num)
-        line.add_ride_to_line(departure_time, arrival_time, driver)
+        ride_id = line.add_ride_to_line(departure_time, arrival_time, driver)
+        self.rides[ride_id] = self.get_ride(ride_id)
 
         return True
 
@@ -101,18 +105,25 @@ class BusCompany:
                 if ride_id == ride.ride_id:
                     return ride
 
-    def p_report_delay(self, ride_id: int, delay: int):
+    def p_report_delay(self, query: int | str, ride_id: int, delay: int):
+        print(self.p_get_line(query))
         ride = self.get_ride(ride_id)
         ride.delays += timedelta(seconds=delay * 60)
         ride.arrival_time += ride.delays
         return ride
+
+#TODO:
+    #Add exceptions and/or returns to ALL functions
+    #Get ride for passenger shouldn't display driver name
+    #Build menu classes
+    #Construct __main__
 
 
 comp = BusCompany()
 
 comp._add_line(1, 'hi', 'bye', 'a,b,c')
 comp._add_line(2, 'b', 'bye', 'a,b,c')
-comp._add_line(3, 'hi', 'bye', 'a,b,d')
+comp._add_line(3, 'hi', 'bye', 'a,b,c')
 comp._add_ride_to_line(3, '23:00', '23:30', 'Ziv')
 comp._add_ride_to_line(3, '23:00', '23:30', 'Ziv')
 comp._add_ride_to_line(2, '23:00', '23:30', 'David')
@@ -120,4 +131,4 @@ comp._add_ride_to_line(1, '23:05', '23:30', 'Michael')
 print(comp.p_get_line("3"))
 print(comp.p_get_line("2"))
 print(comp.p_get_line("bye"))
-print(comp.p_report_delay(111, 10))
+# print(comp.p_report_delay('1', 999, 15))

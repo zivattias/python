@@ -6,7 +6,7 @@ class Ride:
                  delays: timedelta.seconds = timedelta(seconds=0)):
         self.ride_id = ride_id
         self.departure_time = departure_time
-        self.arrival_time = arrival_time
+        self.arrival_time = datetime.strptime(arrival_time, '%H:%M')
         self.driver = driver
         self.delays = delays
 
@@ -15,7 +15,7 @@ class Ride:
                f"Departure Time: {self.departure_time}\n" \
                f"Operating Driver: {self.driver}\n" \
                f"Expected Delays: {self.delays}\n" \
-               f"Arrival Time: {self.arrival_time}"
+               f"Arrival Time: {self.arrival_time.time()}"
 
     def __repr__(self):
         return f"<Ride #{self.ride_id} @ {self.departure_time}>"
