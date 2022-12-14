@@ -68,8 +68,21 @@ class TableReservationSystem:
         self.max_time_limit = max_time_limit
 
         self.tables: list[Table] = []
+        self.tables_dict = {}
         for i, table_seats in enumerate(tables_list):
             self.tables.append(Table(table_id=i, seats=table_seats, max_time_limit=self.max_time_limit))
+
+    def __iter__(self):
+        self.table_idx = 0
+        return self
+
+    def __next__(self):
+        if self.table_idx == len(self.tables):
+            raise StopIteration()
+        table = self.tables[self.table_idx]
+        self.table_idx += 1
+        return table
+
 
     def reserve(self, guests_num, table_id) -> bool:
         for table in self.tables:
@@ -145,3 +158,10 @@ class TableReservationSystem:
             suitable_tables.pop(min_table_idx)
 
         return sorted_tables
+
+
+if __name__ == '__main__':
+    system = TableReservationSystem([2, 3, 2, 4, 4], 'alhambra')
+
+    for table in system:
+        print(table)
