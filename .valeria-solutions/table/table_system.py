@@ -1,6 +1,7 @@
 import datetime
 import os.path
 import pickle
+from table_system_exceptions import *
 
 
 class Table:
@@ -16,21 +17,21 @@ class Table:
     def is_available(self):
         return self.occupied_seats == 0
 
-    def reserve(self, guests_num) -> bool:
-
+    def reserve(self, guests_num):
+        if self.occupied_seats != 0:
+            raise TableAlreadyOccupied(self.table_id)
+        if self.seats < guests_num:
+            raise InsufficientSeatsInTable(self.table_id, self.seats, guests_num)
         # we allow to reserve a table only if it's available
         # and amount fo guests fits the amount of seats
-        if self.occupied_seats == 0 and self.seats >= guests_num:
-            self.occupied_seats = guests_num
-            self.start_time = datetime.datetime.utcnow()
-            return True
-        return False
+        self.occupied_seats = guests_num
+        self.start_time = datetime.datetime.utcnow()
 
-    def release(self) -> bool:
+    def release(self):
 
         # The table is already available
         if self.occupied_seats == 0:
-            return False
+            raise TableAlreadyAvailable(self.table_id)
 
         self.occupied_seats = 0
         self.start_time = None
@@ -38,7 +39,7 @@ class Table:
     def _get_end_time(self):
         return self.start_time + self.max_time_limit
 
-    def time_left(self) -> datetime.timedelta:
+    def time_left(self) -> datetime.timedelta | datetime.datetime:
 
         if not self.start_time:
             return datetime.timedelta()
@@ -60,7 +61,8 @@ class Table:
 
 class TableReservationSystem:
 
-    def __init__(self, tables_list: list, name: str, max_time_limit: datetime.timedelta=datetime.timedelta(minutes=90)):
+    def __init__(self, tables_list: list, name: str,
+                 max_time_limit: datetime.timedelta = datetime.timedelta(minutes=90)):
 
         self.name = name
         self.max_time_limit = max_time_limit
@@ -75,13 +77,13 @@ class TableReservationSystem:
                 return table.reserve(guests_num)
 
         # table with provided id does not exist
-        return False
+        raise TableNotFound(table_id)
 
     def release(self, table_id) -> bool:
         for table in self.tables:
             if table.table_id == table_id:
                 return table.release()
-        return False
+        raise TableNotFound(table_id)
 
     def get_available_tables(self, guests_num) -> list[Table]:
         """
