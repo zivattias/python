@@ -13,7 +13,13 @@ class Ride:
     def __str__(self):
         return f"Ride #{self.ride_id}:\n" \
                f"Departure Time: {self.departure_time}\n" \
-               f"Operating Driver: {self.driver}\n" \
+               f"Driver: {self.driver}\n" \
+               f"Expected Delays: {self.delays}\n" \
+               f"Arrival Time: {self.arrival_time.time()}\n" \
+
+    def p_str(self):
+        return f"Ride #{self.ride_id}:\n" \
+               f"Departure Time: {self.departure_time}\n" \
                f"Expected Delays: {self.delays}\n" \
                f"Arrival Time: {self.arrival_time.time()}"
 

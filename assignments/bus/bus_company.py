@@ -13,6 +13,7 @@ class BusCompany:
         self.lines_by_origin: dict[str: Line] = {}
         self.lines_by_destination: dict[str: Line] = {}
         self.lines_by_stops: dict[str: Line] = {}
+        self.line_nums_by_ride_id: dict[int: int] = {}  # ride_id: line_num
 
         self.rides: dict[int: Ride] = {}
 
@@ -64,7 +65,7 @@ class BusCompany:
     def _update_line(self, line_num, criteria: str, new_data: str):
         line = self._get_line(line_num)
 
-        if criteria not in dir(line):
+        if criteria not in ['origin', 'destination', 'stops']:
             raise InvalidLineAttribute(criteria)
 
         if criteria == 'stops':
@@ -83,7 +84,8 @@ class BusCompany:
     def _add_ride_to_line(self, line_num, departure_time: datetime.time, arrival_time: datetime.time, driver: str):
         line = self._get_line(line_num)
         ride_id = line.add_ride_to_line(departure_time, arrival_time, driver)
-        self.rides[ride_id] = self.get_ride(ride_id)
+        self.rides[ride_id] = Ride(ride_id, datetime.strptime(departure_time, "%H:%M").time(), arrival_time, driver)
+        self.line_nums_by_ride_id[ride_id] = line.line_num
 
         return True
 
@@ -103,32 +105,22 @@ class BusCompany:
         for line in self.lines.values():
             for ride in line.rides.values():
                 if ride_id == ride.ride_id:
-                    return ride
+                    return ride.p_str()
 
-    def p_report_delay(self, query: int | str, ride_id: int, delay: int):
-        print(self.p_get_line(query))
-        ride = self.get_ride(ride_id)
-        ride.delays += timedelta(seconds=delay * 60)
-        ride.arrival_time += ride.delays
-        return ride
+    def p_report_delay(self, ride_id: int, delay: int):
+        if ride_id not in self.rides:
+            raise RideNotFound(ride_id)
 
-#TODO:
-    #Add exceptions and/or returns to ALL functions
-    #Get ride for passenger shouldn't display driver name
-    #Build menu classes
-    #Construct __main__
+        # Update Ride delay within Line instance:
+        for line in self.lines.values():
+            for ride in line.rides.values():
+                if ride_id == ride.ride_id:
+                    ride.delays += timedelta(seconds=delay * 60)
+                    ride.arrival_time += timedelta(seconds=delay * 60)
 
+        # Update Ride delay in Company db:
+        ride_in_comp = self.rides[ride_id]
+        ride_in_comp.delays += timedelta(seconds=delay * 60)
+        ride_in_comp.arrival_time += timedelta(seconds=delay * 60)
 
-comp = BusCompany()
-
-comp._add_line(1, 'hi', 'bye', 'a,b,c')
-comp._add_line(2, 'b', 'bye', 'a,b,c')
-comp._add_line(3, 'hi', 'bye', 'a,b,c')
-comp._add_ride_to_line(3, '23:00', '23:30', 'Ziv')
-comp._add_ride_to_line(3, '23:00', '23:30', 'Ziv')
-comp._add_ride_to_line(2, '23:00', '23:30', 'David')
-comp._add_ride_to_line(1, '23:05', '23:30', 'Michael')
-print(comp.p_get_line("3"))
-print(comp.p_get_line("2"))
-print(comp.p_get_line("bye"))
-# print(comp.p_report_delay('1', 999, 15))
+        return ride.p_str()

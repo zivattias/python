@@ -30,6 +30,5 @@ class Line:
         while ride_id in self.rides:
             ride_id = random.randint(1000, 9999)
         departure_object = datetime.strptime(departure_time, "%H:%M").time()
-        ride = Ride(ride_id, departure_object, arrival_time, driver)
-        self.rides[ride_id] = ride
+        self.rides[ride_id] = Ride(ride_id, departure_object, arrival_time, driver)
         return ride_id

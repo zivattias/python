@@ -16,3 +16,7 @@ class InvalidStopsString(Exception):
 class InvalidLineAttribute(Exception):
     def __init__(self, criteria):
         super().__init__(f"Invalid line attribute (criteria): {criteria}")
+
+class RideNotFound(Exception):
+    def __init__(self, ride_id):
+        super().__init__(f"Ride not found: {ride_id}")
