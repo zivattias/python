@@ -11,7 +11,7 @@ class InvalidLetterType(Exception):
     def __init__(self, letter: str, type_: type):
         self.letter = letter
         self.type = type_
-        super().__init__(f'Must use str: {self.letter} ({self.type}) is invalid')
+        super().__init__(f'Must use str: {self.letter} ({self.type.__name__}) is invalid')
 
 
 # ------------------------------------------------------------------------------------------------------
@@ -28,10 +28,7 @@ def get_letter_index(letter: str):
     if letter not in letters:
         raise NonAlphabetItem(letter)
 
-    if letter in lowercase:
-        index = lowercase.index(letter)
-    else:
-        index = uppercase.index(letter)
+    index = lowercase.index(letter) if letter in lowercase else uppercase.index(letter)
 
     return index + 1
 
