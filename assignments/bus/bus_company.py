@@ -20,7 +20,7 @@ class BusCompany:
     @staticmethod
     def stops_converter(stops: str) -> list:
         if stops.count(',') < 1:
-            raise InvalidStopsString
+            raise InvalidStopsString()
 
         return [stop.strip() for stop in stops.split(',')]
 

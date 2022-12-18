@@ -3,6 +3,7 @@ import pickle
 
 from assignments.bus.menu import Menu
 from assignments.bus.bus_company import BusCompany
+from assignments.bus.exceptions.exceptions import *
 
 
 if __name__ == '__main__':
@@ -13,5 +14,9 @@ if __name__ == '__main__':
         with open('./bus_company.pickle', 'rb') as fh:
             bus_company = pickle.load(fh)
         print('Loaded existing company...')
+    try:
+        menu = Menu(bus_company).run()
 
-    menu = Menu(bus_company).run()
+    except (LineExists, LineMissing, InvalidStopsString, InvalidLineAttribute, RideNotFound) as e:
+        print(e)
+

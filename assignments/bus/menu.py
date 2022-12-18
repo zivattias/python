@@ -1,4 +1,5 @@
 from assignments.bus.bus_company import BusCompany
+from assignments.bus.exceptions.exceptions import *
 import pickle
 
 
@@ -29,6 +30,7 @@ class Menu:
             break
 
     def run(self):
+
         print('Welcome to Bus Manager 1.0, you can log-in as manager or choose to use'
               'the app as a passenger.\n'
               'LOG-IN: Who would you like to log-in as? (M - Manager, P - Passenger)')
