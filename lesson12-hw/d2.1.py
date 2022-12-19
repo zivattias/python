@@ -7,10 +7,7 @@ from datetime import datetime, timedelta
 
 class DateIterator:
     def __init__(self, date: str):
-        try:
-            self.date = datetime.strptime(date, '%d-%m-%Y').date()
-        except ValueError:
-            raise ValueError("Incorrect data format, should be DD-MM-YYYY")
+        self.date = datetime.strptime(date, '%d-%m-%Y').date()
 
         self.month_in_date = datetime.strftime(self.date, '%d-%m-%Y').split('-')[1]
         self.year_in_date = datetime.strftime(self.date, '%d-%m-%Y').split('-')[2]
@@ -30,5 +27,8 @@ class DateIterator:
         return self.date
 
 
-for i in DateIterator('19-12-2022'):
-    print(i)
+try:
+    for i in DateIterator('23-12-2022'):
+        print(i)
+except ValueError:
+    print('Incorrect data format, should be DD-MM-YYYY')
