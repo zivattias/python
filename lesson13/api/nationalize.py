@@ -64,18 +64,21 @@ class NationalizeAPI:
 
 if __name__ == '__main__':
     try:
-        nationalize = NationalizeAPI('Ziv')
+        nationalize = NationalizeAPI('Boris')
         country = nationalize.get_country()[0]
         continent = nationalize.get_country()[1]
         languages = nationalize.get_country()[2]
         timezones = nationalize.get_country()[3]
         # curr_time = [pytz.utc.localize(timezone, is_dst=None).astimezone() for timezone in timezones]
-        print(country, continent, languages, timezones, sep="\n")
+        print(f"Country: {country}",
+              f"Continent: {continent}",
+              f"Languages: {languages}",
+              f"All Timezones: {timezones}", sep="\n")
 
         country_timezone = pytz.country_timezones[nationalize.get_most_probable_country()]  # [Asia/Jerusalem]
         for country_time in country_timezone:
             curr_time = pytz.utc.localize(datetime.utcnow(), is_dst=None).astimezone(timezone(country_time))
-            print(curr_time.strftime('%H:%M'))
+            print(f"> Timezone: {country_time}, Time: {curr_time.strftime('%H:%M')}")
 
     except BadResponse as e:
         print(e)
