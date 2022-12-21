@@ -6,20 +6,20 @@ class BankAccount:
     def __init__(self, bank_name):
         self.name = bank_name
 
-    @staticmethod
     def working_hours_only(open_hour: int = 9, close_hour: int = 17):
+
         def wrapper(func):
             def decorated(*args, **kwargs):
                 now = datetime.datetime.now()
                 day = now.weekday()
                 time = now.time()
+
                 opening_hour = datetime.time(open_hour, 0, 0)
                 closing_hour = datetime.time(close_hour, 0, 0)
 
                 if opening_hour < time < closing_hour and (0 <= day <= 3 or day == 6):
                     result = func(*args, **kwargs)
                     return result
-
                 else:
                     raise Exception('Non-working hours')
 
@@ -27,12 +27,12 @@ class BankAccount:
 
         return wrapper
 
-    @working_hours_only
+    @working_hours_only(open_hour=9, close_hour=17)
     def withdraw(self, amount):
         print('Called withdraw', amount)
         return amount
 
-    @working_hours_only
+    @working_hours_only(open_hour=9, close_hour=17)
     def deposit(self, amount):
         print('Called deposit', amount)
         return amount
