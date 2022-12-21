@@ -13,5 +13,5 @@ def get_israeli_phones(string: str) -> list[str]:
 
 
 if __name__ == '__main__':
-    string = '052-8039540hello-world052-1110004$56&&04-56768999!!052-99987!!'
-    print(get_israeli_phones(string))
+    s = '052-8039540hello-world052-1110004$56&&04-56768999!!052-99987!!'
+    print(get_israeli_phones(s))
