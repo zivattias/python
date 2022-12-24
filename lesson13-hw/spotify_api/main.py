@@ -83,30 +83,34 @@ class SpotifyAPI:
 
 
 if __name__ == '__main__':
-    spotify = SpotifyAPI('zivattias7')
-    print("Welcome to Ziv's playlist manager, powered by Spotify Web API")
-    print("First, let's create an empty playlist!")
-    pl_name = input("Enter the playlist's title: ")
-    pl_desc = input("Let's give it some description: ")
+    try:
+        spotify = SpotifyAPI('zivattias7')
+        print("Welcome to Ziv's playlist manager, powered by Spotify Web API")
+        print("First, let's create an empty playlist!")
+        pl_name = input("Enter the playlist's title: ")
+        pl_desc = input("Let's give it some description: ")
 
-    spotify.create_empty_playlist(playlist_name=pl_name, playlist_desc=pl_desc)
+        spotify.create_empty_playlist(playlist_name=pl_name, playlist_desc=pl_desc)
 
-    print(f"Your playlist has been created. This is its Spotify URI: {spotify.get_playlist_uri()}")
-    print("Great! Let's add some tracks to our playlist!")
+        print(f"Your playlist has been created. This is its Spotify URI: {spotify.get_playlist_uri()}")
+        print("Great! Let's add some tracks to our playlist!")
 
-    while True:
-        try:
-            track = input("Track name ('$' to finish): ")
-            if track == '$':
-                if spotify.count_tracks() < 1:
-                    print("Let's add at least one track prior to finishing the process.")
-                    continue
-                break
-            print(spotify.get_track(track))
-        except SpotifyInvalidTrack as e:
-            print(e)
+        while True:
+            try:
+                track = input("Track name ('$' to finish): ")
+                if track == '$':
+                    if spotify.count_tracks() < 1:
+                        print("Let's add at least one track prior to finishing the process.")
+                        continue
+                    break
+                print(spotify.get_track(track))
+            except SpotifyInvalidTrack as e:
+                print(e)
 
-    if spotify.add_tracks_to_playlist():
+        spotify.add_tracks_to_playlist()
         print('Added tracks:')
         for i, value in enumerate(spotify.get_tracks().values()):
             print(f"{i + 1}. {value}")
+
+    except SpotifyException as e:
+        print(e)
