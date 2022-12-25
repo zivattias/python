@@ -23,7 +23,9 @@ def create_files(base_prefix: str, num: int):
         future = executor.submit(create_single_file, file_path, i, lines)  # does not block
         futures.append(future)
 
-    done, not_done = wait(futures, return_when=concurrent.futures.ALL_COMPLETED)
+    done, not_done = wait(futures,
+                          return_when=concurrent.futures.ALL_COMPLETED,
+                          timeout=5)
     print(f"done: {len(done)}")
     print(f"not done: {len(not_done)}")
 
