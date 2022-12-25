@@ -1,0 +1,4 @@
+Multi thread elapsed time (10 names): 11.409912824630737
+Multi thread elapsed time (10 names): 11.107355833053589
+Single thread elapsed time (10 names): 61.21306109428406
+Multi thread elapsed time (10 names): 11.719214677810669
