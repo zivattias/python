@@ -1,0 +1,9 @@
+A Python code is a process:
+In computing, a process is an instance of a computer program that is being executed.
+
+Any process has 3 basic components:
+1. An executable program.
+2. The associated data needed by the program (variables, work space, buffers, etc.)
+3. The execution context of the program (State of process)
+
+Multiprocessing or multithreading is the execution of multiple processes concurrently (simultaneously).
