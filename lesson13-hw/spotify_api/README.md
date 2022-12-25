@@ -1,0 +1,1 @@
+The program requires an account token for Spotify authorization. It will create an empty playlist in your account, and ask for tracks to be added to it. The communication is done through Spotify Web API.
