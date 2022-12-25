@@ -12,7 +12,7 @@ class SpotifyAPI:
         self._headers = {
             'Accept': 'application-json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer BQAj3o460oHnMyJK2SzMQza8Tl-0XVpYMu00vd1hAdWbdr0zXlp44T7wga_SwZrdsFXb_oSy76IQY-oOExtjNDYQXJx6lACZJ3bqk9_bIFa3lQvR6o-duVglLE_-s--7TAXy-0SHFhFJBSnaY9unfP32cZ5-T7hVhvDMX5A0gRMKNikxWACbFW8fZlv7e6n9Kb-fS4102gL5-sKvHV52qyuiJpc96lm45oupF3KtcJUK'
+            'Authorization': 'Bearer TOKEN'
         }
 
         self._tracks: dict[str, str] = dict()
