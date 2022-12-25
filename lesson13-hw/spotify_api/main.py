@@ -12,7 +12,7 @@ class SpotifyAPI:
         self._headers = {
             'Accept': 'application-json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer BQCbnAmJAXhgJMjtoS6SE6APW1LpE49EDbAcxu4EJyYPbQD8Myij35XdS1SZOpTmKyrbv1CsJVfvCmMRHmyM6hFY1glGwR46mXeXeR1DQw85dQvzcwL0ZlekgwnBIci3mgqTqUp_zX_fqt_YNCrF_c1AliSaf_xAKd5ne94fts3jSBghVRoj2NzIxf_eRCgJN4CcpUCtFUda3lENqvM8w1yOwOVH9GKAK-ZL-G1iOhq-'
+            'Authorization': 'Bearer BQAj3o460oHnMyJK2SzMQza8Tl-0XVpYMu00vd1hAdWbdr0zXlp44T7wga_SwZrdsFXb_oSy76IQY-oOExtjNDYQXJx6lACZJ3bqk9_bIFa3lQvR6o-duVglLE_-s--7TAXy-0SHFhFJBSnaY9unfP32cZ5-T7hVhvDMX5A0gRMKNikxWACbFW8fZlv7e6n9Kb-fS4102gL5-sKvHV52qyuiJpc96lm45oupF3KtcJUK'
         }
 
         self._tracks: dict[str, str] = dict()
@@ -88,7 +88,7 @@ class SpotifyAPI:
 if __name__ == '__main__':
     try:
         spotify = SpotifyAPI('zivattias7')
-        print(f"Welcome to {spotify.get_username}'s playlist manager, powered by Spotify Web API")
+        print(f"Welcome to {spotify.get_username()}'s playlist manager, powered by Spotify Web API")
         print("First, let's create an empty playlist!")
 
         while True:
