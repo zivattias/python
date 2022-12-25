@@ -12,7 +12,7 @@ class SpotifyAPI:
         self._headers = {
             'Accept': 'application-json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer BQDYe8WpBBeyW_-oR0ze8RTwJY1XQdPXGl8RZ2f5_fLuyd5FB4VcBb0O06KxDmc0yL35lVC46sKgfsICYmaXCP27C2g_qxxQZO2gadGDK-Fvq9lPDXvyT4s9BEndulvwBHb2j-p-kwM07oFAhWrakX977bQiBUWGb0yeyyT1bUAiDZJcAuKVACg71FthIqSZwLVdeR5oazrZyeu5V9Hp-adGzdZ_98x_xEBRse2Rgu_2'
+            'Authorization': 'Bearer BQCbnAmJAXhgJMjtoS6SE6APW1LpE49EDbAcxu4EJyYPbQD8Myij35XdS1SZOpTmKyrbv1CsJVfvCmMRHmyM6hFY1glGwR46mXeXeR1DQw85dQvzcwL0ZlekgwnBIci3mgqTqUp_zX_fqt_YNCrF_c1AliSaf_xAKd5ne94fts3jSBghVRoj2NzIxf_eRCgJN4CcpUCtFUda3lENqvM8w1yOwOVH9GKAK-ZL-G1iOhq-'
         }
 
         self._tracks: dict[str, str] = dict()
@@ -65,6 +65,9 @@ class SpotifyAPI:
     def get_tracks(self):
         return self._tracks
 
+    def get_username(self):
+        return self._username
+
     def add_tracks_to_playlist(self):
         all_tracks_string = ""
         for track_uri in self._tracks.keys():
@@ -85,10 +88,21 @@ class SpotifyAPI:
 if __name__ == '__main__':
     try:
         spotify = SpotifyAPI('zivattias7')
-        print("Welcome to Ziv's playlist manager, powered by Spotify Web API")
+        print(f"Welcome to {spotify.get_username}'s playlist manager, powered by Spotify Web API")
         print("First, let's create an empty playlist!")
-        pl_name = input("Enter the playlist's title: ")
-        pl_desc = input("Let's give it some description: ")
+
+        while True:
+            pl_name = input("Enter the playlist's title: ")
+            if not pl_name:
+                print('You must provide a title.')
+                continue
+            break
+        while True:
+            pl_desc = input("Let's give it some description: ")
+            if not pl_desc:
+                print('You must provide a description.')
+                continue
+            break
 
         spotify.create_empty_playlist(playlist_name=pl_name, playlist_desc=pl_desc)
 
