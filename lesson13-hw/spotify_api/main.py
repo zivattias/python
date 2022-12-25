@@ -35,7 +35,8 @@ class SpotifyAPI:
                 json_resp['tracks']['items'][0]['uri']] = \
                 f"{json_resp['tracks']['items'][0]['artists'][0]['name']} - {json_resp['tracks']['items'][0]['name']}"
 
-            return f"{json_resp['tracks']['items'][0]['artists'][0]['name']} - {json_resp['tracks']['items'][0]['name']}"
+            return f"{json_resp['tracks']['items'][0]['artists'][0]['name']}" \
+                   f" - {json_resp['tracks']['items'][0]['name']}"
 
         raise SpotifyServerError()
 
