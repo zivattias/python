@@ -7,3 +7,7 @@ Any process has 3 basic components:
 3. The execution context of the program (State of process)
 
 Multiprocessing or multithreading is the execution of multiple processes concurrently (simultaneously).
+
+
+If your program is IO-bound, both multithreading and multiprocessing in Python will work smoothly.
+However, if the code is CPU-bound and your machine has multiple cores, multiprocessing would be a better choice.
