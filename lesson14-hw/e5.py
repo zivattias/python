@@ -3,7 +3,7 @@
 
 import csv
 import os
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+import concurrent.futures
 
 
 class AAPLFile:
@@ -33,7 +33,7 @@ class AAPLFile:
             os.makedirs(directory)
         return directory
 
-    def get_years_list(self):   # CPU bound operation
+    def get_years_list(self):  # CPU bound operation
         years = []
         with open(self.path, 'r') as f:
             reader = csv.DictReader(f, delimiter=self.delimiter)
@@ -57,22 +57,69 @@ class AAPLFile:
                     writer = csv.DictWriter(f_w, fieldnames=fieldnames)
                     writer.writeheader()
 
-            for line in reader:
+                    print(f'Finished headers for {f_w.name}')
+
+            for i, line in enumerate(reader):
+                if i != 0 and line['Date'].split('-')[2] != year:
+                    print(f'Finished lines for {f_w.name}')
                 year = line['Date'].split('-')[2]
                 with open(f'files/AAPL_{year}.csv', 'a') as f_w:
                     writer = csv.DictWriter(f_w, fieldnames=fieldnames)
                     writer.writerow(line)
 
-    def get_averages(self):
+
+    def calc_averages(self):  # CPU bound operation
         directory = self.valid_dir()
 
-        averages = dict()
+        low_sum = open_sum = vol_sum = high_sum = close_sum = adj_sum = 0
 
         for file in os.listdir(directory):
-            print(file)
+            year = file.split('_')[1].split('.')[0]
+            full_file_path = os.path.join(directory, file)
 
+            with open(full_file_path, 'r') as f:
+                reader = csv.DictReader(f, delimiter=self.delimiter)
+                fieldnames = reader.fieldnames
+
+                lines_counter = 0
+                for line in reader:
+                    low_sum += float(line['Low'])
+                    open_sum += float(line['Open'])
+                    vol_sum += float(line['Volume'])
+                    high_sum += float(line['High'])
+                    close_sum += float(line['Close'])
+                    adj_sum += float(line['Adjusted Close'])
+                    lines_counter += 1
+
+                row_dict = {'Date': year,
+                            'Low': low_sum / lines_counter,
+                            'Open': open_sum / lines_counter,
+                            'Volume': vol_sum / lines_counter,
+                            'High': high_sum / lines_counter,
+                            'Close': close_sum / lines_counter,
+                            'Adjusted Close': adj_sum / lines_counter}
+
+                print(f'Calculated averages for file: {full_file_path}')
+
+            self._write_averages(full_file_path, fieldnames, row_dict)
+
+    @staticmethod
+    def _write_averages(full_file_path, fieldnames, row_dict):   # IO bound operation
+        with open(full_file_path, 'a') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writerow(row_dict)
+
+        print(f'Wrote averages for file {full_file_path}')
 
 
 if __name__ == '__main__':
-    file = AAPLFile('AAPL.csv')
-    file.get_averages()
+    og = AAPLFile('aapl_data.csv')
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        t1 = executor.submit(og.write_files)
+
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        p1 = executor.submit(og.calc_averages)
+
+    # og.write_files()
+    # og.calc_averages()
