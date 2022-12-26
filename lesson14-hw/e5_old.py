@@ -1,4 +1,4 @@
-# The last line of each file should contain a row with averages of the data for this year.
+# e5.v1 - OLD, doesn't work!
 
 
 import csv
