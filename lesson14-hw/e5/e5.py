@@ -70,8 +70,12 @@ class FileProcessor:
 
 
 if __name__ == '__main__':
-    start = time.perf_counter()
-    file = FileProcessor('aapl_data.csv', 'processed_files')
-    tasks = file.main()
-    end = time.perf_counter()
-    print(f"Done: {len(tasks[0])}, undone: {len(tasks[1])} | Elapsed time: {(end - start):2f} second(s)")
+    try:
+        start = time.perf_counter()
+        file = FileProcessor('aapl_data.csv', 'processed_files')
+        tasks = file.main()
+        end = time.perf_counter()
+        print(f"Done: {len(tasks[0])}, undone: {len(tasks[1])} | Elapsed time: {(end - start):2f} second(s)")
+
+    except AAPLException as e:
+        print(e)
