@@ -68,6 +68,8 @@ class FileProcessor:
         done, undone = concurrent.futures.wait(tasks, return_when=concurrent.futures.ALL_COMPLETED)
         return done, undone
 
+        # for year in years:
+        #     self.process_year(year)
 
 if __name__ == '__main__':
     try:
@@ -76,6 +78,7 @@ if __name__ == '__main__':
         tasks = file.main()
         end = time.perf_counter()
         print(f"Done: {len(tasks[0])}, undone: {len(tasks[1])} | Elapsed time: {(end - start):2f} second(s)")
+        # print(f"Done! Elapsed time: {(end - start):2f} second(s)")
 
     except AAPLException as e:
         print(e)
