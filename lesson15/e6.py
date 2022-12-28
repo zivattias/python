@@ -34,6 +34,7 @@ def get_quote():
         return response.json()['quote']
     raise RequestException()
 
+
 start = time.perf_counter()
 count_down(3)
 print(f"Runtime: {(time.perf_counter() - start):.2f} seconds")
