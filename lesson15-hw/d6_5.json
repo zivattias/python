@@ -1,0 +1,27 @@
+{
+ "fs-7732-3": {
+   "dirs": [
+     {
+       "lesson 8": {
+         "dirs": [
+           {
+             "modules": {
+               "dirs": [],
+               "files": [
+                 "tic_tac.py",
+                 "validators.py"
+               ]
+             }
+           }
+         ],
+         "files": [
+           "modules_packages.py",
+           "mutability.py",
+           "water_hint.py"
+         ]
+       }
+     }
+   ],
+   "files": []
+ }
+}
