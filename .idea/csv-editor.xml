@@ -87,6 +87,34 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/lesson15-hw/dir_ex/inner_dir_ex2/inner_f3.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/lesson15-hw/files/csv.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/lesson15-hw/files/d6_3.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/lesson15-hw/files/d6_4.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/lesson9-hw/d1/AAPL.csv">
           <value>
             <Attribute>
