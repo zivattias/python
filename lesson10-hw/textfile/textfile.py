@@ -41,7 +41,7 @@ class TextFile(ABC):
         return f"{'/'.join(f1_path.split('/')[:-1])}/" \
                f"{f1_name}_{f2_name}.{self._get_extension()}"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return type(self) == type(other)
 
     def __add__(self, other):
@@ -69,13 +69,13 @@ class CsvFile(TextFile):
         super().__init__(fp)
         self._delimiter = delimiter
 
-    def get_delimiter(self):
+    def get_delimiter(self) -> str:
         return self._delimiter
 
-    def _get_extension(self):
+    def _get_extension(self) -> str:
         return 'csv'
 
-    def _get_content(self, fh):
+    def _get_content(self, fh) -> list:
         ret_val = []
         for row in csv.DictReader(fh, delimiter=self.get_delimiter()):
             ret_val.append(row)
@@ -106,7 +106,7 @@ class CsvFile(TextFile):
                 col_data.append(line[col_num])
         return col_data
 
-    def get_cell(self, row_num, column_num):
+    def get_cell(self, row_num, column_num) -> str:
         with open(self.get_file_path(), 'r') as f:
             reader = csv.reader(f, delimiter=self.get_delimiter())
             if row_num > self.get_rows_num() or column_num > self.get_columns_num():
@@ -153,10 +153,10 @@ class CsvFile(TextFile):
 
 
 class TxtFile(TextFile):
-    def _get_extension(self):
+    def _get_extension(self) -> str:
         return 'txt'
 
-    def _get_content(self, fh):
+    def _get_content(self, fh) -> str:
         return fh.read()
 
     def _concat(self, other):
@@ -174,7 +174,7 @@ class TxtFile(TextFile):
 
 
 class JsonFile(TextFile):
-    def _get_extension(self):
+    def _get_extension(self) -> str:
         return 'json'
 
     def _get_content(self, fh):
@@ -187,8 +187,8 @@ class JsonFile(TextFile):
         with open(self.get_file_path(), 'r') as f:
             return json.load(f)
 
-    def is_list(self):
+    def is_list(self) -> bool:
         return True if type(self._load_json()) is list else False
 
-    def is_object(self):
+    def is_object(self) -> bool:
         return True if type(self._load_json()) is dict else False
