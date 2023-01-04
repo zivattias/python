@@ -8,5 +8,3 @@ class VTAnalyzer:
 
     def _get_reputation_for_single_url(self, url: str):
         pass
-
-# Test12
