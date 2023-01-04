@@ -13,38 +13,35 @@ class BankAccount:
     def balance(self):
         return self._balance
 
+    def lock(self):
+        return self._lock
+
     def transactions(self):
         return self._transactions
 
-    # @staticmethod
-    # def lock_decorator(func):
-    #     lock = Lock()
-    #
-    #     def decorated_func(*args, **kwargs):
-    #         try:
-    #             with lock:
-    #                 func(*args, **kwargs)
-    #         except BankAccountException as e:
-    #             print(e)
-    #         # finally:
-    #         #     if lock.locked():
-    #         #         lock.release()
-    #
-    #     return decorated_func
+    @staticmethod
+    def lock_decorator(func):
+        def decorated_func(self: "BankAccount", *args, **kwargs):
+            try:
+                with self.lock():
+                    return func(self, *args, **kwargs)
+            finally:
+                if self.lock().locked():
+                    self.lock().release()
 
-    # @lock_decorator
+        return decorated_func
+
+    @lock_decorator
     def deposit(self, amount: int):
-        with self._lock:
-            self._balance += amount
-            self._transactions.append('deposit')
+        self._balance += amount
+        self._transactions.append('deposit')
 
-    # @lock_decorator
+    @lock_decorator
     def withdraw(self, amount: int):
         if amount > self.balance():
             raise MaxCreditReached()
-        with self._lock:
-            self._balance -= amount
-            self._transactions.append('withdraw')
+        self._balance -= amount
+        self._transactions.append('withdraw')
 
 
 if __name__ == '__main__':
@@ -61,20 +58,12 @@ if __name__ == '__main__':
             account.withdraw(i)
 
 
-    t1 = Thread(target=multiple_transactions_deposit, args=(my_account,))
-    t2 = Thread(target=multiple_transactions_deposit, args=(my_account,))
-    t3 = Thread(target=multiple_transactions_withdraw, args=(my_account,))
-    t4 = Thread(target=multiple_transactions_withdraw, args=(my_account,))
+    threads = [Thread(target=multiple_transactions_deposit, args=(my_account,)) for _ in range(4)]
+    for t in threads:
+        t.start()
 
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
-
-    t1.join()
-    t2.join()
-    t3.join()
-    t4.join()
+    for t in threads:
+        t.join()
 
     assert my_account._balance == 0, \
         f"Expected balance: 0, received: {my_account.balance()}"
