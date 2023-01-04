@@ -6,7 +6,7 @@
 # Test your code with this folder.
 # Hint: check out os.walk function to iterate directory.
 
-path = '/Users/ziv.attias/PycharmProjects/python-course/lesson9-hw/files_ex'
+path = '//lesson9-hw/files_ex'
 
 import os
 

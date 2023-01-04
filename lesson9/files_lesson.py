@@ -2,7 +2,7 @@ import string
 
 # File paths:
 relative_path = "data/alice_in_wonderland.txt"
-absolute_path = "/Users/ziv.attias/PycharmProjects/python-course/lesson9/data/alice_in_wonderland.txt"
+absolute_path = "//lesson9/data/alice_in_wonderland.txt"
 
 # MANUAL OPEN & CLOSE:
 file_handler = open(relative_path, 'r')     # Open file ('r' - Read-Only)

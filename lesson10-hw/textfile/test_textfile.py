@@ -6,18 +6,18 @@ class TestTextfile(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.csv_1 = CsvFile('/Users/ziv.attias/PycharmProjects/python-course/lesson10-hw/textfile/files_ex/csv_1.csv')
-        cls.csv_2 = CsvFile('/Users/ziv.attias/PycharmProjects/python-course/lesson10-hw/textfile/files_ex/csv_2.csv',
+        cls.csv_1 = CsvFile('/Users/ziv.attias/PycharmProjects/lessons/lesson10-hw/textfile/files_ex/csv_1.csv')
+        cls.csv_2 = CsvFile('/Users/ziv.attias/PycharmProjects/lessons/lesson10-hw/textfile/files_ex/csv_2.csv',
                             ';')
-        cls.csv_3 = CsvFile('/Users/ziv.attias/PycharmProjects/python-course/lesson10-hw/textfile/files_ex/csv_3.csv')
+        cls.csv_3 = CsvFile('/Users/ziv.attias/PycharmProjects/lessons/lesson10-hw/textfile/files_ex/csv_3.csv')
 
-        cls.txt_1 = TxtFile('/Users/ziv.attias/PycharmProjects/python-course/lesson10-hw/textfile/files_ex/txt_1.txt')
-        cls.txt_2 = TxtFile('/Users/ziv.attias/PycharmProjects/python-course/lesson10-hw/textfile/files_ex/txt_2.txt')
+        cls.txt_1 = TxtFile('/Users/ziv.attias/PycharmProjects/lessons/lesson10-hw/textfile/files_ex/txt_1.txt')
+        cls.txt_2 = TxtFile('/Users/ziv.attias/PycharmProjects/lessons/lesson10-hw/textfile/files_ex/txt_2.txt')
 
         cls.json_1 = JsonFile(
-            '/Users/ziv.attias/PycharmProjects/python-course/lesson10-hw/textfile/files_ex/json_1.json')
+            '/Users/ziv.attias/PycharmProjects/lessons/lesson10-hw/textfile/files_ex/json_1.json')
         cls.json_2 = JsonFile(
-            '/Users/ziv.attias/PycharmProjects/python-course/lesson10-hw/textfile/files_ex/json_2.json')
+            '/Users/ziv.attias/PycharmProjects/lessons/lesson10-hw/textfile/files_ex/json_2.json')
 
     def test_paths(self):
         self.assertTrue(self.csv_1)
@@ -45,9 +45,9 @@ class TestTextfile(unittest.TestCase):
 
     def test_new_file_dir(self):
         self.assertEqual(CsvFile.get_combined_path(self.csv_1, self.csv_2),
-                         "/Users/ziv.attias/PycharmProjects/python-course/lesson10-hw/textfile/files_ex/csv_1_csv_2.csv")
+                         "/Users/ziv.attias/PycharmProjects/lessons/lesson10-hw/textfile/files_ex/csv_1_csv_2.csv")
         self.assertEqual(TxtFile.get_combined_path(self.txt_1, self.txt_2),
-                         "/Users/ziv.attias/PycharmProjects/python-course/lesson10-hw/textfile/files_ex/txt_1_txt_2.txt")
+                         "/Users/ziv.attias/PycharmProjects/lessons/lesson10-hw/textfile/files_ex/txt_1_txt_2.txt")
 
 
 if __name__ == "__main__":
