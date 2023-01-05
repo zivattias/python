@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--scan', action='store_true')    # on/off flag
 
     # Perform the parse
-    args = parser.parse_args(['https://edulabs.co.il', '-k', 'my_key', '-s'])
+    args = parser.parse_args(['https://edulabs.co.il', '-k', 'my_key', '--scan'])
     print(args.url, args.apikey, args.scan)
 
     # Here will come the call for actual logic
