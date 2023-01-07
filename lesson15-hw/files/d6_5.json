@@ -1,0 +1,1 @@
+{"dir_ex": {"files": ["f1.py"], "dirs": [{"inner_dir_ex2": {"files": ["inner_f3.csv", "inner_f4.json"], "dirs": [{"this_is_a_dir_test_2": {"files": [], "dirs": []}}]}}, {"inner_dir_ex1": {"files": ["inner_f1.py", "inner_f2.txt"], "dirs": [{"this_is_a_dir_test": {"files": [], "dirs": []}}]}}]}}
