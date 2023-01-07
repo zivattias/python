@@ -39,7 +39,7 @@ def get_domain_reputation(json_resp: dict):
     total_values_sum = sum(stats.values())
     max_val = max(stats.values())
     max_key = list(stats.keys())[list(stats.values()).index(max_val)]
-    ratio = total_values_sum / max_val
+    ratio = max_val / total_values_sum
     return max_key, ratio
 
 
