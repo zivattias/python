@@ -6,22 +6,21 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from functools import lru_cache
 
-'''
-VirusTotal API responses:
-
-URL analysis:
-1. 404 for a never-scanned URL
-2. 200 for a scanned URL, returns an analysis dict:
-Result stats - ["data"]["attributes"]["last_analysis_stats"] (dict['harmless', 'malicious', 'suspicious', 'undetected'])
-Last submission date - ["data"]["attributes"]["last_submission_date"] (epoch timestamp)
-
-URL scan:
-1. 400 for an invalid URL - "Unable to canonicalize url"
-2. 200 for success, returns dict["data"] = {"type": "analysis, "id": str}
-'''
-
 
 class VTAnalyzer:
+    """
+    VirusTotal API responses:
+
+    URL analysis:
+    1. 404 for a never-scanned URL
+    2. 200 for a scanned URL, returns an analysis dict:
+    Result stats - ["data"]["attributes"]["last_analysis_stats"] (dict['harmless', 'malicious', 'suspicious', 'undetected'])
+    Last submission date - ["data"]["attributes"]["last_submission_date"] (epoch timestamp)
+
+    URL scan:
+    1. 400 for an invalid URL - "Unable to canonicalize url"
+    2. 200 for success, returns dict["data"] = {"type": "analysis, "id": str}
+    """
 
     def __init__(self):
         # Cache maps URL Base64 strings to a respective (last_analysis_time, (result, ratio)) nested tuple
@@ -35,6 +34,8 @@ class VTAnalyzer:
         self._parser.add_argument('url', help='URL to scan')
         self._parser.add_argument('-k', '--apikey')
         self._parser.add_argument('-s', '--scan', action='store_true')
+        # Environmental API key variable
+        self._token = os.environ["VT_KEY"]
 
     @staticmethod
     def base_encoder(url: str):
