@@ -4,19 +4,16 @@
 import os
 from pprint import pprint
 
-def dir2dict(dp: str):
-    ret_val = dict()
-    for root, dirs, files in os.walk(dp, topdown=True):
-        if len(root.split('/')) == 1:
-            ret_val[root] = {'dirs': [], 'files': []}
-            continue
-        inner_dir = root.split('/')[1]
-        outer_dir = root.split('/')[0]
-        ret_val[outer_dir]['dirs'].append([inner_dir])
-        print(ret_val)
-    # dir = os.walk(dp, topdown=True)
-    # print(next(dir))
-    # print(next(dir))
-    # print(next(dir))
 
-dir2dict('dir_ex')
+def dir2dict(dp: str):
+    directory_dict = {}
+
+    for root, dirs, files in os.walk(dp):
+        dir_dict = {'files': files, 'dirs': [dir2dict(os.path.join(root, d)) for d in dirs]}
+        directory_dict[os.path.basename(root)] = dir_dict
+        break
+
+    return directory_dict
+
+
+pprint(dir2dict('dir_ex'))

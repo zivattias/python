@@ -36,9 +36,11 @@ def retrieve_domain_analysis(uri: str):
 
 def get_domain_reputation(json_resp: dict):
     stats = json_resp['data']['attributes']['last_analysis_stats']
+    total_values_sum = sum(stats.values())
     max_val = max(stats.values())
     max_key = list(stats.keys())[list(stats.values()).index(max_val)]
-    return max_key
+    ratio = total_values_sum / max_val
+    return max_key, ratio
 
 
 if __name__ == '__main__':
