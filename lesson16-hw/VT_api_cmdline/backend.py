@@ -1,7 +1,6 @@
 # WIP
 import base64
 import os
-import argparse
 import requests
 import datetime
 from concurrent.futures import ThreadPoolExecutor
@@ -24,25 +23,23 @@ class VTAnalyzer:
     URL scan:
     1. 400 for an invalid URL - "Unable to canonicalize url"
     2. 200 for success, returns dict["data"] = {"type": "analysis, "id": str}
+
+    Additional argument option:
+    --quota / -q for verbose waiting if the user ran out of VT's available quota
     """
 
     def __init__(self):
         # Cache maps URL Base64 strings to a respective (last_analysis_time, (result, ratio)) nested tuple
         self._cache: dict[str: tuple[str, tuple[str, float]]] = dict()
+        self._cache_age = 180
         # A uniformed Lock() for threaded actions, e.g. accessing cache and executing actions on it
         self._lock = Lock()
-        # Argparse utilization
-        self._parser = argparse.ArgumentParser(prog="URL Reputation Check, Powered by VirusTotal's API",
-                                               description="The program allows you to check URL(s)",
-                                               epilog="By Ziv Attias")
-        self._parser.add_argument('url', help='URL to scan')
-        self._parser.add_argument('-k', '--apikey')
-        self._parser.add_argument('-s', '--scan', action='store_true')
         # Environmental API key variable
         self._token = os.environ["VT_KEY"]
 
-    def check_cache(self, epoch: str) -> bool:
-        # Check cache and validate last analysis time
+    def check_cache(self, epoch: str) -> bool | datetime.date:
+        # Check cache (convert epoch to date) and validate last analysis time
+        # returns a datetime.date object
         pass
 
     @staticmethod
@@ -54,7 +51,7 @@ class VTAnalyzer:
         data = f"url={url}"
         headers = {
             "accept": "application/json",
-            "x-apikey": "d0a6e2b1f6c04e78f9225b3ead707a06ad672101ff55858f5a13ed07085fbf81",
+            "x-apikey": os.environ["VT_KEY"],
             "content-type": "application/x-www-form-urlencoded"
         }
         response = requests.post(SCAN_URL, data=data, headers=headers)
@@ -62,15 +59,18 @@ class VTAnalyzer:
             return True
         raise BadRequest(request=response, status_code=response.status_code)
 
-    def get_urls_reputation(self, urls: list) -> dict[str, bool]:
-        # Get reputation for multiple URLs
-        pass
+    def get_urls_reputation(self, urls: list) -> list[str]:
+        return [self._get_reputation_for_single_uri(url) for url in urls]
 
-    def _get_reputation_for_single_uri(self, uri: str):
-        if uri in self._cache and self.check_cache(self._cache[uri][0]):
-            pass
-        response = requests.get(ANALYSIS_URL + uri,
+    def _get_reputation_for_single_uri(self, url: str):
+        if url in self._cache and \
+            datetime.date.today() - self.check_cache(self._cache[url][0]) <= datetime.timedelta(days=self._cache_age):
+            return self._cache[url][1]
+
+        response = requests.get(ANALYSIS_URL + self.url_encoder(url),
                                 headers={'x-apikey': os.environ["VT_KEY"]})
+
         if response.status_code == 404:
-            # scan
-            pass
+            self.perform_scan_url(url)
+
+
