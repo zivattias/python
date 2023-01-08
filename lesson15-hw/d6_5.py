@@ -12,10 +12,14 @@ def dir2dict(dp: str, jp: str = None):
 
     directory_dict = {}
 
-    for root, dirs, files in os.walk(dp):
-        dir_dict = {'files': files, 'dirs': [dir2dict(os.path.join(root, d)) for d in dirs]}
-        directory_dict[os.path.basename(root)] = dir_dict
-        break
+    root, dirs, files = next(os.walk(dp))
+    dir_dict = {'files': files, 'dirs': [dir2dict(os.path.join(root, d)) for d in dirs]}
+    directory_dict[os.path.basename(root)] = dir_dict
+
+    # for root, dirs, files in os.walk(dp):
+    #     dir_dict = {'files': files, 'dirs': [dir2dict(os.path.join(root, d)) for d in dirs]}
+    #     directory_dict[os.path.basename(root)] = dir_dict
+    #     break
 
     if jp:
         with open(jp, 'w') as f:
