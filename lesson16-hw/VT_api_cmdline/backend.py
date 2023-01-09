@@ -149,6 +149,8 @@ class VTAnalyzer:
             with self._lock:
                 self._cache[url] = (last_analysis_epoch, (max_key, ratio))
 
+            return self._cache[url]
+
     def _single_url_flow(self, url: str) -> list:
         source = 'cache'
 
@@ -167,7 +169,10 @@ class VTAnalyzer:
                 for url in self._urls:
                     if self._scan:
                         executor.submit(self.scan_url, url)
-                    ret_val.append(executor.submit(self._single_url_flow, url).result())
+                        result = executor.submit(self.analyze_url, url).result()
+                        ret_val.append([url, result[0], result[1][0], result[1][1], 'api'])
+                    else:
+                        ret_val.append(executor.submit(self._single_url_flow, url).result())
 
         # If user input a single URL:
         if isinstance(self._urls, str):
