@@ -6,7 +6,7 @@ from consts import *
 from exceptions import *
 from threading import Lock
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 class VTAnalyzer:
@@ -40,9 +40,8 @@ class VTAnalyzer:
         self._verbose = verbose
         # API key init
         self._token = apikey if apikey else os.environ["VT_KEY"]
-        # Cache age
-        self._cache_age = int(age)
-
+        # Cache age - defaults to 182 as precaution if user inputs non-digit --age arg
+        self._cache_age = int(age) if isinstance(age, int) or age.isdigit() else 182
         # Cache maps URL strings to a respective (last_analysis_date, (result, ratio)) nested tuple
         if not os.path.exists('cache.json'):
             self._cache = dict()
@@ -156,28 +155,30 @@ class VTAnalyzer:
 
         if (url not in self._cache) or ((url in self._cache) and (not self.check_cache(self._cache[url][0], url))):
             print(f"Either URL {url} not in cache or cache is outdated, proceeding to analysis")
-            self.analyze_url(url)
+            ret_val = self.analyze_url(url)
             source = 'api'
+            # If VirusTotal db returns an outdated analysis, inform user the program re-scans
+            if datetime.utcnow() - ret_val[0] > timedelta(days=self._cache_age):
+                print(f"URL {url} last analysis took place on: "
+                      f"{datetime.utcfromtimestamp(ret_val[0]).strftime('%d-%m-%Y')}, "
+                      f"{datetime.utcnow() - ret_val[0]} days ago. "
+                      f"Re-scanning to uphold with cache age limit: {self._cache_age}")
+                self.scan_url(url)
 
         return [url, self._cache[url][0], self._cache[url][1][0], self._cache[url][1][1], source]
 
     def main(self):
         ret_val = list()
-        # If user input a list of URLs:
-        if isinstance(self._urls, list):
-            with ThreadPoolExecutor() as executor:
-                for url in self._urls:
-                    if self._scan:
-                        executor.submit(self.scan_url, url)
+        with ThreadPoolExecutor() as executor:
+            futures = []
+            for url in self._urls:
+                if self._scan:
+                    futures.append(executor.submit(self.scan_url, url))
+                    for _ in as_completed(futures):
                         result = executor.submit(self.analyze_url, url).result()
                         ret_val.append([url, result[0], result[1][0], result[1][1], 'api'])
-                    else:
-                        ret_val.append(executor.submit(self._single_url_flow, url).result())
-
-        # If user input a single URL:
-        if isinstance(self._urls, str):
-            self.scan_url(self._urls) if self._scan else None
-            ret_val.append(self._single_url_flow(self._urls))
+                else:
+                    ret_val.append(executor.submit(self._single_url_flow, url).result())
 
         # Pretty result prints:
         for result in ret_val:
