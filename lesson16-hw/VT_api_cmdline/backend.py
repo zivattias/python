@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import base64
 import requests
 from consts import *
@@ -138,9 +139,13 @@ class VTAnalyzer:
 
         if response.status_code == 404:
             print(f"Found no analysis for URL {url}, initializing scan") if self._verbose else None
-            self.analyze_url(url) if self.scan_url(url)[0] else None
+            if self.scan_url(url)[0]:
+                time.sleep(2)
+
+        response = requests.get(url=full_url, headers=headers)
 
         if response.status_code == 200 or response.status_code == 202:
+            print(f"Analyzed URL {url} successfully!")
             json_resp = response.json()
             last_analysis_epoch = json_resp["data"]["attributes"]["last_analysis_date"]
             max_key, ratio = self._get_url_reputation(json_resp)
@@ -157,13 +162,18 @@ class VTAnalyzer:
             print(f"Either URL {url} not in cache or cache is outdated, proceeding to analysis")
             ret_val = self.analyze_url(url)
             source = 'api'
-            # If VirusTotal db returns an outdated analysis, inform user the program re-scans
-            if datetime.utcnow() - ret_val[0] > timedelta(days=self._cache_age):
-                print(f"URL {url} last analysis took place on: "
+            # If VirusTotal db returns an outdated analysis, inform user the program re-scans & re-analyzes
+            days_since = datetime.utcnow() - datetime.utcfromtimestamp(ret_val[0])
+            if days_since > timedelta(days=self._cache_age):
+                print(f"URL {url} last analysis ({ret_val[1][0]}, {ret_val[1][1]:.2f}%) took place on: "
                       f"{datetime.utcfromtimestamp(ret_val[0]).strftime('%d-%m-%Y')}, "
-                      f"{datetime.utcnow() - ret_val[0]} days ago. "
-                      f"Re-scanning to uphold with cache age limit: {self._cache_age}")
+                      f"{days_since.days} days ago. "
+                      f"Re-scanning to uphold with cache age limit: {self._cache_age} days") if self._verbose else None
                 self.scan_url(url)
+                print("Waiting 2 seconds...")
+                time.sleep(2)
+                ret_val = self.analyze_url(url)
+                return [url, ret_val[0], ret_val[1][0], ret_val[1][1], source]
 
         return [url, self._cache[url][0], self._cache[url][1][0], self._cache[url][1][1], source]
 

@@ -18,7 +18,7 @@ if __name__ == '__main__':
                         help='verbose prints throughout the process')
     parser.add_argument('-a', '--age', default=182,
                         help='declare cache max age (days), default = 182')
-    args = parser.parse_args(['https://community.ls-rp.com/', '-v'])
+    args = parser.parse_args(['https://www.zooloo.co.il/Gamess4adlkjsd', '-v', '-a', '7'])
 
     # Create an instance of VTAnalyzer with the parsed arguments and run main()
     analyzer = VTAnalyzer(urls=args.url, apikey=args.apikey, scan=args.scan,
