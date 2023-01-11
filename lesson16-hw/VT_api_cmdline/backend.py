@@ -166,6 +166,8 @@ class VTAnalyzer:
                       f"Re-scanning to uphold with cache age limit: {self._cache_age} days") if self._verbose else None
                 self.scan_url(url)
 
+                time.sleep(5)
+
                 full_url = f"{ANALYSIS_URL}/{self.encode_url(url)}"
                 headers = {
                     "accept": "application/json",
