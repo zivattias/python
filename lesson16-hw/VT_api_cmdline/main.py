@@ -18,7 +18,7 @@ if __name__ == '__main__':
                         help='verbose prints throughout the process')
     parser.add_argument('-a', '--age', default=182,
                         help='declare cache max age (days), default = 182')
-    args = parser.parse_args(['https://mcdonalds.com', 'https://facebook.com', '-v', '-a', '1'])
+    args = parser.parse_args(['https://reebok.com/', 'https://facebook.com', '-a', '1'])
 
     # Create an instance of VTAnalyzer with the parsed arguments and run main()
     analyzer = VTAnalyzer(urls=args.url, apikey=args.apikey, scan=args.scan,

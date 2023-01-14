@@ -108,11 +108,7 @@ class VTAnalyzer:
         :return tuple(max_key, ratio): max_key in ['harmless', 'malicious', 'suspicious', 'undetected'],
         ratio = accuracy percentage
         """
-        stats = json_resp['data']['attributes']['last_analysis_stats']
-        total_values_sum, max_val = sum(stats.values()), max(stats.values())
-        max_key = list(stats.keys())[list(stats.values()).index(max_val)]
-        ratio = max_val / total_values_sum * 100
-        return max_key, ratio
+
 
     def analyze_url(self, url: str):
         """
@@ -204,5 +200,6 @@ class VTAnalyzer:
                 print(f"URL {i} result: N/A")
 
         # Save cache:
-        with open('cache.json', 'w') as f:
+        with open('cache.json', 'f') as f:
             json.dump(self._cache, f)
+
