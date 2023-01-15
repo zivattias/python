@@ -1,3 +1,5 @@
+# WIP
+
 from util_methods import *
 import psycopg2
 from datetime import datetime
@@ -41,6 +43,7 @@ def get_account_by_passport(num: int) -> list:
     conn.close()
     return [account[0] for account in accounts_ids]
 
+# from account is account num whereas get_accounbt_by_passport returns account_id
 
 def transfer(from_account: int, to_account: int, amount: int, initiated_by: int) -> bool:
     if (not (validate_account_num(from_account) and validate_account_num(to_account))) or \
