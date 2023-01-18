@@ -8,7 +8,7 @@ def homepage():
     return "<p style='color: red'>Hello, World!</p>"
 
 
-@app.route("/<str:username>", methods=['POST'])
+@app.route("/<string:username>")
 def get_user_data(username):
     return f"Hi, {username}!"
 
