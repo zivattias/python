@@ -67,15 +67,14 @@ def get_account_id_by_account_num(num: int) -> int:
 
 def transfer(from_account: int, to_account: int, amount: int, initiated_by: int) -> bool:
     if (not (validate_account_num(from_account) and validate_account_num(to_account))) or (
-        from_account not in get_account_by_passport(initiated_by)) or (
-        amount > (get_balance(from_account) + get_max_limit(from_account))):
+       from_account not in get_account_by_passport(initiated_by)) or (
+       amount > (get_balance(from_account) + get_max_limit(from_account))):
         return False
 
     with psycopg2.connect(**params) as conn:
         with conn.cursor() as curs:
             curs.execute("INSERT INTO transactions(trans_type, ts, initiator_id) "
                          f"VALUES ('transfer', '{datetime.now()}', {get_customer_id_by_passport(initiated_by)})")
-            curs.execute("commit;")
             curs.execute("SELECT currval('transactions_id_seq'::regclass);")
             trans_id = curs.fetchone()[0]
             curs.execute("INSERT INTO transactions_accounts(account_role, account_id, transaction_id)"
