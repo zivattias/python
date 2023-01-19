@@ -15,27 +15,29 @@ _RESOURCES = [
 
 
 @app.route('/')
+@app.route('/home')
 def home():
     return "Bank API by Ziv"
 
 
 # Get all customers' wet data (inc account_id)
 # Allowed filtering by page_num, results_per_page, name, address and passport_num
-@app.route('/api/v1/customers', methods=['GET'])
+@app.route('/api/v1/customers', methods=['GET', 'POST'])
 def get_all_customers_wet():
-    results_per_page = request.args.get('rpp') or 20
-    page_num = request.args.get('page') or 0
-    passport_num = request.args.get('passport_num')
-    name = request.args.get('name')
-    address = request.args.get('address')
-
-    if not isinstance(page_num, int) or not isinstance(results_per_page, int):
-        if not str(page_num).isdigit() or not str(results_per_page).isdigit():
-            return jsonify({'Error': 'Invalid page num/results per page, must be positive integers!'}), 404
-
-    page_num, results_per_page = int(page_num), int(results_per_page)
-
     if request.method == 'GET':
+        results_per_page = request.args.get('rpp') or 20
+        page_num = request.args.get('page') or 0
+        passport_num = request.args.get('passport_num')
+        name = request.args.get('name')
+        address = request.args.get('address')
+
+        try:
+            page_num, results_per_page = int(page_num), int(results_per_page)
+            if page_num < 0 or results_per_page < 0:
+                return jsonify({'Error': 'page num and results per page must be positive'}), 404
+        except ValueError:
+            return jsonify({'Error': 'page num and results per page must be integers'}), 404
+
         query = "SELECT customers.id, passport_num, fullname, address, account_id FROM customers " \
                 "JOIN customers_accounts ON customers.id = customers_accounts.customer_id"
 
@@ -79,6 +81,9 @@ def get_all_customers_wet():
                     return jsonify(ret_data), 200
                 else:
                     return jsonify({'Error': 'No customer found with given filter params'}), 404
+
+    if request.method == 'POST':
+        ...
 
 
 # Get a specific customer dry data (exc account-related data)
