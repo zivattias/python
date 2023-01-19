@@ -2,7 +2,8 @@ from configparser import ConfigParser
 
 __all__ = [
     'params',
-    'endpoint'
+    'endpoint',
+    'dictify'
 ]
 
 _API_URL = 'http://127.0.0.1'
@@ -28,3 +29,9 @@ def params(filename='config.ini', section='postgresql'):
 
 def endpoint():
     return _API_URL + _ENDPOINT
+
+
+def dictify(d: dict) -> dict:
+    return {
+        'data': d
+    }
