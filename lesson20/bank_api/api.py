@@ -19,22 +19,23 @@ def get_all_customers():
     if request.method == 'GET':
         with conn:
             with conn.cursor() as curs:
-                curs.execute("SELECT * FROM customers")
+                query = "SELECT customers.id, passport_num, fullname, address, account_id FROM customers " \
+                        "JOIN customers_accounts ON customers.id = customers_accounts.customer_id"
+                curs.execute(query)
                 result = curs.fetchall()
-                ret_data = list()
-                for item in result:
-                    query = f"SELECT account_id FROM customers_accounts WHERE customer_id = %s"
-                    curs.execute(query, (item[0],))
-                    account_id = curs.fetchone()
-                    item_dict = {
-                        'id': item[0],
-                        'passport_num': item[1],
-                        'fullname': item[2],
-                        'address': item[3],
-                        'account_id': account_id[0]
+                ret_data = {
+                    'data': {
+                        'customer_id': {
+                            item[0]: {
+                                'passport_num': item[1],
+                                'name': item[2],
+                                'address': item[3]
+                            }
+                            for item in result
+                        }
                     }
-                    ret_data.append(item_dict)
-    return jsonify(ret_data)
+                }
+                return jsonify(ret_data)
 
 
 if __name__ == '__main__':

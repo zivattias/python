@@ -1,0 +1,16 @@
+{
+  "data": {
+    "customer_id": {
+      "1": {
+        "address": "California",
+        "name": "Brad Pitt",
+        "passport_num": 123456789
+      },
+      "2": {
+        "address": "California",
+        "name": "Angelina Jolie",
+        "passport_num": 101010101
+      }
+    }
+  }
+}
