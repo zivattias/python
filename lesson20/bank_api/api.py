@@ -1,6 +1,6 @@
-from util_methods import *
 import psycopg2
 from flask import Flask, jsonify, request
+from util_methods import *
 
 app = Flask(__name__)
 
