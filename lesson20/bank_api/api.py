@@ -1,5 +1,5 @@
 import psycopg2
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 from util_methods import *
 
 app = Flask(__name__)
@@ -76,14 +76,38 @@ def get_all_customers_wet():
                                 'address': item[3]
                             }
                             for item in result
-                        }}
-                    )
+                        }
+                    })
                     return jsonify(ret_data), 200
                 else:
                     return jsonify({'Error': 'No customer found with given filter params'}), 404
 
     if request.method == 'POST':
-        ...
+        if {"passport_num", "name", "address"} != request.form.keys():
+            return jsonify({"Error": "Invalid form data params"}), 400
+
+        passport_num = request.form['passport_num']
+        name = request.form['name']
+        address = request.form['address']
+
+        try:
+            passport_num = int(passport_num)
+        except ValueError:
+            return jsonify({"Error": "Passport number must be an integer"}), 400
+
+        if passport_num is None or name is None or address is None:
+            return abort(400, passport_num, name, address, "To add a customer, you must specify all params")
+
+        query = f"INSERT INTO customers (passport_num, fullname, address)" \
+                f" VALUES (%s, %s, %s)"
+
+        with conn:
+            with conn.cursor() as curs:
+                curs.execute(query, (passport_num, name, address))
+                if curs.rowcount == 1:
+                    return jsonify({"Success": f"Added customer: {passport_num, name, address}"})
+                else:
+                    return jsonify({'Error': 'Failed to add a customer'}), 400
 
 
 # Get a specific customer dry data (exc account-related data)
@@ -138,4 +162,4 @@ def get_customer_accounts(customer_id):
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=3000)
+    app.run(port=3000)
