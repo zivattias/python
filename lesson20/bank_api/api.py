@@ -22,6 +22,7 @@ def home():
 
 # Get all customers' wet data (inc account_id)
 # Allowed filtering by page_num, results_per_page, name, address and passport_num
+# Add customers to db by using a POST method
 @app.route('/api/v1/customers', methods=['GET', 'POST'])
 def get_all_customers_wet():
     if request.method == 'GET':
@@ -95,8 +96,9 @@ def get_all_customers_wet():
         except ValueError:
             return jsonify({"Error": "Passport number must be an integer"}), 400
 
-        if passport_num is None or name is None or address is None:
-            return abort(400, passport_num, name, address, "To add a customer, you must specify all params")
+        if not name or not address:
+            return jsonify({"Error": f"To add a customer, "
+                                     f"you must specify all params {passport_num, name, address}"}), 400
 
         query = f"INSERT INTO customers (passport_num, fullname, address)" \
                 f" VALUES (%s, %s, %s)"
