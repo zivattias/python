@@ -1,5 +1,5 @@
 import psycopg2
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request
 from util_methods import *
 
 app = Flask(__name__)
@@ -8,11 +8,6 @@ _API_URL = endpoint()
 _PARAMS = params()
 conn = psycopg2.connect(**_PARAMS)
 
-_RESOURCES = [
-    'customers',
-    'accounts'
-]
-
 
 @app.route('/')
 @app.route('/home')
@@ -20,6 +15,7 @@ def home():
     return "Bank API by Ziv"
 
 
+# CUSTOMERS METHODS #
 # Get all customers' wet data (inc account_id)
 # Allowed filtering by page_num, results_per_page, name, address and passport_num
 # Add customers to db by using a POST method
