@@ -12,10 +12,11 @@ conn = psycopg2.connect(**_PARAMS)
 @app.route('/')
 @app.route('/home')
 def home():
-    return "Bank API by Ziv"
+    return "Bank API by Ziv Attias"
 
 
 # CUSTOMERS METHODS #
+
 # Get all customers' wet data (inc account_id)
 # Allowed filtering by page_num, results_per_page, fullname, address and passport_num
 # Add customers to db by using a POST method
@@ -36,7 +37,7 @@ def get_all_customers_wet():
             return jsonify({'Error': 'page num and results per page must be integers'}), 404
 
         query = "SELECT customers.id, passport_num, fullname, address, account_id FROM customers " \
-                "JOIN customers_accounts ON customers.id = customers_accounts.customer_id"
+                "LEFT JOIN customers_accounts ON customers.id = customers_accounts.customer_id"
 
         conditions = list()
         params = list()
@@ -70,7 +71,8 @@ def get_all_customers_wet():
                             item[0]: {
                                 'passport_num': item[1],
                                 'fullname': item[2],
-                                'address': item[3]
+                                'address': item[3],
+                                'account_id': item[4]
                             }
                             for item in result
                         }
@@ -109,9 +111,10 @@ def get_all_customers_wet():
 
 
 # Get a specific customer dry data (exc account-related data)
-# Update a specific customer with form data - WIP
-@app.route('/api/v1/customers/<int:customer_id>', methods=['GET', 'PUT'])
-def get_customer_dry(customer_id):
+# Update a specific customer with form data params
+# Delete specific customer from db
+@app.route('/api/v1/customers/<int:customer_id>', methods=['GET', 'PUT', 'DELETE'])
+def specific_customer(customer_id):
     if request.method == 'GET':
         with conn:
             with conn.cursor() as curs:
@@ -162,6 +165,16 @@ def get_customer_dry(customer_id):
                 else:
                     return jsonify({'Error': 'Invalid customer ID provided'}), 400
 
+    if request.method == 'DELETE':
+        with conn:
+            with conn.cursor() as curs:
+                query = "DELETE FROM customers WHERE id = %s"
+                curs.execute(query, (customer_id,))
+                if curs.rowcount == 1:
+                    return jsonify({"Success": f"Deleted customer {customer_id}"}), 200
+                else:
+                    return jsonify({"Error": f"Invalid customer ID {customer_id}"}), 400
+
 
 # Get specific customer's accounts data
 @app.route('/api/v1/customers/<int:customer_id>/accounts')
@@ -188,5 +201,67 @@ def get_customer_accounts(customer_id):
                 return jsonify({'Error': f'No accounts found for customer with given ID ({customer_id}).'}), 404
 
 
+# ACCOUNTS METHODS #
+
+# Get specific account data
+@app.route('/api/v1/accounts/<int:account_id>')
+def get_account_by_id(account_id):
+    with conn:
+        with conn.cursor() as curs:
+            query = "SELECT * FROM accounts WHERE account_num = %s"
+            curs.execute(query, (account_id,))
+            result = curs.fetchall()
+            if result:
+                ret_data = dictify({
+                    item[1]: {
+                        "account_id": item[0],
+                        "max_limit": item[2],
+                        "balance": item[3]
+                    }
+                    for item in result
+                })
+                return jsonify(ret_data), 200
+            else:
+                return jsonify({"Error": f"Invalid account ID given {account_id}"}), 400
+
+# Get all accounts data
+# Filtering by balance and/or max_limit allowed
+@app.route('/api/v1/accounts')
+def get_all_accounts():
+    balance = request.args.get('balance')
+    max_limit = request.args.get('max_limit')
+
+    conditions = list()
+    params = list()
+
+    if balance:
+        conditions.append("balance = %s")
+        params.append(balance)
+
+    if max_limit:
+        conditions.append("max_limit = %s")
+        params.append(max_limit)
+
+    query = "SELECT * FROM accounts"
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    with conn:
+        with conn.cursor() as curs:
+            curs.execute(query, params)
+            result = curs.fetchall()
+            if not result:
+                return jsonify({"Error": "No accounts found for given query params"}), 404
+            ret_data = dictify({
+                    item[1]: {
+                        "account_id": item[0],
+                        "max_limit": item[2],
+                        "balance": item[3]
+                    }
+                    for item in result
+                })
+            return jsonify(ret_data), 200
+
+
 if __name__ == '__main__':
-    app.run(port=3000)
+    app.run(port=3000, debug=True)
