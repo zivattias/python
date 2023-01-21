@@ -17,7 +17,7 @@ def home():
 
 # CUSTOMERS METHODS #
 # Get all customers' wet data (inc account_id)
-# Allowed filtering by page_num, results_per_page, name, address and passport_num
+# Allowed filtering by page_num, results_per_page, fullname, address and passport_num
 # Add customers to db by using a POST method
 @app.route('/api/v1/customers', methods=['GET', 'POST'])
 def get_all_customers_wet():
@@ -25,7 +25,7 @@ def get_all_customers_wet():
         results_per_page = request.args.get('rpp') or 20
         page_num = request.args.get('page') or 0
         passport_num = request.args.get('passport_num')
-        name = request.args.get('name')
+        fullname = request.args.get('fullname')
         address = request.args.get('address')
 
         try:
@@ -45,9 +45,9 @@ def get_all_customers_wet():
             conditions.append("passport_num::text ILIKE %s")
             params.append(f"%{passport_num}%")
 
-        if request.args.get('name'):
+        if request.args.get('fullname'):
             conditions.append("fullname ILIKE %s")
-            params.append(f"%{name}%")
+            params.append(f"%{fullname}%")
 
         if request.args.get('address'):
             conditions.append("address ILIKE %s")
@@ -69,7 +69,7 @@ def get_all_customers_wet():
                         'customer_id': {
                             item[0]: {
                                 'passport_num': item[1],
-                                'name': item[2],
+                                'fullname': item[2],
                                 'address': item[3]
                             }
                             for item in result
@@ -80,11 +80,11 @@ def get_all_customers_wet():
                     return jsonify({'Error': 'No customer found with given filter params'}), 404
 
     if request.method == 'POST':
-        if {"passport_num", "name", "address"} != request.form.keys():
+        if {"passport_num", "fullname", "address"} != request.form.keys():
             return jsonify({"Error": "Invalid form data params"}), 400
 
         passport_num = request.form['passport_num']
-        name = request.form['name']
+        fullname = request.form['fullname']
         address = request.form['address']
 
         try:
@@ -92,18 +92,18 @@ def get_all_customers_wet():
         except ValueError:
             return jsonify({"Error": "Passport number must be an integer"}), 400
 
-        if not name or not address:
+        if not fullname or not address:
             return jsonify({"Error": f"To add a customer, "
-                                     f"you must specify all params {passport_num, name, address}"}), 400
+                                     f"you must specify all params {passport_num, fullname, address}"}), 400
 
         query = f"INSERT INTO customers (passport_num, fullname, address)" \
                 f" VALUES (%s, %s, %s)"
 
         with conn:
             with conn.cursor() as curs:
-                curs.execute(query, (passport_num, name, address))
+                curs.execute(query, (passport_num, fullname, address))
                 if curs.rowcount == 1:
-                    return jsonify({"Success": f"Added customer: {passport_num, name, address}"}), 200
+                    return jsonify({"Success": f"Added customer: {passport_num, fullname, address}"}), 200
                 else:
                     return jsonify({'Error': 'Failed to add a customer'}), 400
 
@@ -122,7 +122,7 @@ def get_customer_dry(customer_id):
                     ret_data = dictify({
                         result[0]: {
                             'passport_num': result[1],
-                            'name': result[2],
+                            'fullname': result[2],
                             'address': result[3]
                         }
                     })
@@ -131,28 +131,24 @@ def get_customer_dry(customer_id):
                     return jsonify({'Error': f'No customer found with given ID ({customer_id}).'}), 404
 
     if request.method == 'PUT':
+        if not set(request.form.keys()).issubset({'passport_num', 'address', 'fullname'}):
+            return jsonify({"Error": "Invalid form data provided"}), 400
+
         with conn:
             with conn.cursor() as curs:
-                if not set(request.form.keys()).issubset({"passport_num", "fullname", "address"}):
-                    return jsonify({"Error": "Invalid form data params"}), 400
-
-                passport_num = request.form['passport_num']
-                fullname = request.form['fullname']
-                address = request.form['address']
-
-                try:
-                    passport_num = int(passport_num)
-                except ValueError:
-                    return jsonify({"Error": "Passport number must be an integer"}), 400
-
                 conditions = list()
                 params = list()
 
                 for key in request.form.keys():
-                    if request.form[key]:
-                        conditions.append(f"{key} = %s")
-                        params.append(request.form[key]) if key != 'passport_num' \
-                            else params.append(int(request.form[key]))
+                    conditions.append(f"{key} = %s")
+                    if key != 'passport_num':
+                        params.append(request.form[key])
+                    else:
+                        try:
+                            int(request.form[key])
+                        except ValueError:
+                            return jsonify({"Error": "Passport number must be an integer"}), 400
+                        params.append(int(request.form[key]))
 
                 query = "UPDATE customers"
 
@@ -162,9 +158,9 @@ def get_customer_dry(customer_id):
                 curs.execute(query, params)
                 if curs.rowcount == 1:
                     return jsonify({"Success": f"Updated customer {customer_id}:"
-                                               f" {passport_num, fullname, address}"}), 200
+                                               f" {params}"}), 200
                 else:
-                    return jsonify({'Error': 'Failed to update a customer'}), 400
+                    return jsonify({'Error': 'Invalid customer ID provided'}), 400
 
 
 # Get specific customer's accounts data
