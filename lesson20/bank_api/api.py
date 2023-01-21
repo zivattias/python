@@ -113,80 +113,83 @@ def get_all_customers_wet():
 @app.route('/api/v1/customers/<int:customer_id>', methods=['GET', 'PUT'])
 def get_customer_dry(customer_id):
     if request.method == 'GET':
-        with conn.cursor() as curs:
-            query = "SELECT * FROM customers WHERE id = %s"
-            curs.execute(query, (customer_id,))
-            result = curs.fetchone()
-            if result:
-                ret_data = dictify({
-                    result[0]: {
-                        'passport_num': result[1],
-                        'name': result[2],
-                        'address': result[3]
-                    }
-                })
-                return jsonify(ret_data), 200
-            else:
-                return jsonify({'Error': f'No customer found with given ID ({customer_id}).'}), 404
+        with conn:
+            with conn.cursor() as curs:
+                query = "SELECT * FROM customers WHERE id = %s"
+                curs.execute(query, (customer_id,))
+                result = curs.fetchone()
+                if result:
+                    ret_data = dictify({
+                        result[0]: {
+                            'passport_num': result[1],
+                            'name': result[2],
+                            'address': result[3]
+                        }
+                    })
+                    return jsonify(ret_data), 200
+                else:
+                    return jsonify({'Error': f'No customer found with given ID ({customer_id}).'}), 404
 
     if request.method == 'PUT':
-        with conn.cursor() as curs:
-            if not set(request.form.keys()).issubset({"passport_num", "fullname", "address"}):
-                return jsonify({"Error": "Invalid form data params"}), 400
+        with conn:
+            with conn.cursor() as curs:
+                if not set(request.form.keys()).issubset({"passport_num", "fullname", "address"}):
+                    return jsonify({"Error": "Invalid form data params"}), 400
 
-            passport_num = request.form['passport_num']
-            fullname = request.form['fullname']
-            address = request.form['address']
+                passport_num = request.form['passport_num']
+                fullname = request.form['fullname']
+                address = request.form['address']
 
-            try:
-                passport_num = int(passport_num)
-            except ValueError:
-                return jsonify({"Error": "Passport number must be an integer"}), 400
+                try:
+                    passport_num = int(passport_num)
+                except ValueError:
+                    return jsonify({"Error": "Passport number must be an integer"}), 400
 
-            conditions = list()
-            params = list()
+                conditions = list()
+                params = list()
 
-            for key in request.form.keys():
-                if request.form[key]:
-                    conditions.append(f"{key} = %s")
-                    params.append(request.form[key]) if key != 'passport_num' \
-                        else params.append(int(request.form[key]))
+                for key in request.form.keys():
+                    if request.form[key]:
+                        conditions.append(f"{key} = %s")
+                        params.append(request.form[key]) if key != 'passport_num' \
+                            else params.append(int(request.form[key]))
 
-            query = "UPDATE customers"
+                query = "UPDATE customers"
 
-            if conditions:
-                query += " SET " + ", ".join(conditions) + f" WHERE id = {customer_id}"
+                if conditions:
+                    query += " SET " + ", ".join(conditions) + f" WHERE id = {customer_id}"
 
-            curs.execute(query, params)
-            if curs.rowcount == 1:
-                return jsonify({"Success": f"Updated customer {customer_id}:"
-                                           f" {passport_num, fullname, address}"}), 200
-            else:
-                return jsonify({'Error': 'Failed to update a customer'}), 400
+                curs.execute(query, params)
+                if curs.rowcount == 1:
+                    return jsonify({"Success": f"Updated customer {customer_id}:"
+                                               f" {passport_num, fullname, address}"}), 200
+                else:
+                    return jsonify({'Error': 'Failed to update a customer'}), 400
 
 
 # Get specific customer's accounts data
 @app.route('/api/v1/customers/<int:customer_id>/accounts')
 def get_customer_accounts(customer_id):
-    with conn.cursor() as curs:
-        query = f"SELECT id, account_num, max_limit, balance FROM accounts WHERE id =" \
-                f" (SELECT account_id FROM customers_accounts WHERE customer_id = {customer_id});"
-        curs.execute(query, (customer_id,))
-        result = curs.fetchall()
-        if result:
-            ret_data = dictify({
-                'account_id': {
-                    item[0]: {
-                        'account_num': item[1],
-                        'max_limit': f"{item[2]:,d}",
-                        'balance': f"{item[3]:,d}"
+    with conn:
+        with conn.cursor() as curs:
+            query = f"SELECT id, account_num, max_limit, balance FROM accounts WHERE id =" \
+                    f" (SELECT account_id FROM customers_accounts WHERE customer_id = {customer_id});"
+            curs.execute(query, (customer_id,))
+            result = curs.fetchall()
+            if result:
+                ret_data = dictify({
+                    'account_id': {
+                        item[0]: {
+                            'account_num': item[1],
+                            'max_limit': f"{item[2]:,d}",
+                            'balance': f"{item[3]:,d}"
+                        }
+                        for item in result
                     }
-                    for item in result
-                }
-            })
-            return jsonify(ret_data), 200
-        else:
-            return jsonify({'Error': f'No accounts found for customer with given ID ({customer_id}).'}), 404
+                })
+                return jsonify(ret_data), 200
+            else:
+                return jsonify({'Error': f'No accounts found for customer with given ID ({customer_id}).'}), 404
 
 
 if __name__ == '__main__':
