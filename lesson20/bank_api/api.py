@@ -103,14 +103,14 @@ def get_all_customers_wet():
             with conn.cursor() as curs:
                 curs.execute(query, (passport_num, name, address))
                 if curs.rowcount == 1:
-                    return jsonify({"Success": f"Added customer: {passport_num, name, address}"})
+                    return jsonify({"Success": f"Added customer: {passport_num, name, address}"}), 200
                 else:
                     return jsonify({'Error': 'Failed to add a customer'}), 400
 
 
 # Get a specific customer dry data (exc account-related data)
 # Update a specific customer with form data - WIP
-@app.route('/api/v1/customers/<int:customer_id>', methods=['GET', 'POST'])
+@app.route('/api/v1/customers/<int:customer_id>', methods=['GET', 'PUT'])
 def get_customer_dry(customer_id):
     if request.method == 'GET':
         with conn.cursor() as curs:
@@ -129,10 +129,40 @@ def get_customer_dry(customer_id):
             else:
                 return jsonify({'Error': f'No customer found with given ID ({customer_id}).'}), 404
 
-    if request.method == 'POST':
+    if request.method == 'PUT':
         with conn.cursor() as curs:
-            # Update customer data
-            pass
+            if not set(request.form.keys()).issubset({"passport_num", "fullname", "address"}):
+                return jsonify({"Error": "Invalid form data params"}), 400
+
+            passport_num = request.form['passport_num']
+            fullname = request.form['fullname']
+            address = request.form['address']
+
+            try:
+                passport_num = int(passport_num)
+            except ValueError:
+                return jsonify({"Error": "Passport number must be an integer"}), 400
+
+            conditions = list()
+            params = list()
+
+            for key in request.form.keys():
+                if request.form[key]:
+                    conditions.append(f"{key} = %s")
+                    params.append(request.form[key]) if key != 'passport_num' \
+                        else params.append(int(request.form[key]))
+
+            query = "UPDATE customers"
+
+            if conditions:
+                query += " SET " + ", ".join(conditions) + f" WHERE id = {customer_id}"
+
+            curs.execute(query, params)
+            if curs.rowcount == 1:
+                return jsonify({"Success": f"Updated customer {customer_id}:"
+                                           f" {passport_num, fullname, address}"}), 200
+            else:
+                return jsonify({'Error': 'Failed to update a customer'}), 400
 
 
 # Get specific customer's accounts data
