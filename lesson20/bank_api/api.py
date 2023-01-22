@@ -1,10 +1,10 @@
 import psycopg2
 from flask import Flask, jsonify, request
 from util_methods import *
+from datetime import datetime
 
 app = Flask(__name__)
 
-_API_URL = endpoint()
 _PARAMS = params()
 conn = psycopg2.connect(**_PARAMS)
 
@@ -302,6 +302,50 @@ def get_all_accounts():
                                                    f" {account_num, max_limit, account_owners}"})
                 else:
                     return jsonify({"Error": "Couldn't create account with given form data"}), 400
+
+
+# Deposit to account - amount & initiator passport_num in form data
+@app.route('/api/v1/accounts/<int:account_id>/deposit', methods=['POST'])
+def deposit(account_id):
+    if request.method == 'POST':
+        account_id = account_id
+        amount = request.form.get('amount')
+        initiated_by = request.form.get('passport_num')
+        if not initiated_by or not deposit:
+            return jsonify({"Error": "Can't complete deposit without amount and passport number"})
+
+        try:
+            amount = int(amount)
+            initiated_by = int(initiated_by)
+            if amount <= 0:
+                return jsonify({"Error": "Deposit amount must be positive"})
+        except ValueError:
+            return jsonify({"Error": "Deposit amount must be an integer"})
+
+        query = "SELECT customers.passport_num FROM customers_accounts " \
+                "LEFT JOIN customers ON customers_accounts.customer_id = customers.id WHERE account_id = %s"
+        with conn:
+            with conn.cursor() as curs:
+                curs.execute(query, (account_id,))
+                valid_passports = [num[0] for num in curs.fetchall()]
+                if initiated_by not in valid_passports:
+                    return jsonify({"Error": f"Invalid passport number {initiated_by} for account {account_id}"})
+                query = "SELECT id FROM customers WHERE passport_num = %s"
+                curs.execute(query, (initiated_by,))
+                customer_id = curs.fetchone()[0]
+                curs.execute(f"INSERT INTO transactions (trans_type, ts, initiator_id) "
+                             f"VALUES ('deposit', '{datetime.utcnow()}', {customer_id})")
+
+        with conn:
+            with conn.cursor() as curs:
+                curs.execute("SELECT last_value FROM transactions_id_seq")
+                transaction_id = int(curs.fetchone()[0]) + 1
+                if curs.rowcount == 1:
+                    curs.execute("INSERT INTO transactions_accounts (account_role, transaction_id, account_id)"
+                                 f" VALUES ('self', {transaction_id}, {account_id})")
+                    if curs.rowcount == 1:
+                        return jsonify({"Success": f"Transaction {transaction_id} (deposit) for "
+                                                   f"account {account_id} has been completed!"})
 
 
 if __name__ == '__main__':
