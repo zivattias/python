@@ -172,12 +172,18 @@ def specific_customer(customer_id):
     if request.method == 'DELETE':
         with conn:
             with conn.cursor() as curs:
-                query = "DELETE FROM customers WHERE id = %s"
+                query = "SELECT account_id FROM customers_accounts WHERE customer_id = %s"
                 curs.execute(query, (customer_id,))
-                if curs.rowcount == 1:
-                    return jsonify({"Success": f"Deleted customer {customer_id}"}), 200
+                if curs.rowcount > 0:
+                    account_ids = [item[0] for item in curs.fetchall()]
+                    return jsonify({"Error": f"Customer possesses account(s): {account_ids}, delete them first"}), 400
                 else:
-                    return jsonify({"Error": f"Invalid customer ID {customer_id}"}), 400
+                    query = "DELETE FROM customers WHERE id = %s"
+                    curs.execute(query, (customer_id,))
+                    if curs.rowcount == 1:
+                        return jsonify({"Success": f"Deleted customer {customer_id}"}), 200
+                    else:
+                        return jsonify({"Error": f"Invalid customer ID {customer_id}"}), 400
 
 
 # Get specific customer's accounts data
@@ -208,25 +214,43 @@ def get_customer_accounts(customer_id):
 # ACCOUNTS METHODS #
 
 # Get specific account data
-@app.route('/api/v1/accounts/<int:account_id>')
+@app.route('/api/v1/accounts/<int:account_id>', methods=['GET', 'DELETE'])
 def get_account_by_id(account_id):
-    with conn:
-        with conn.cursor() as curs:
-            query = "SELECT * FROM accounts WHERE account_num = %s"
-            curs.execute(query, (account_id,))
-            result = curs.fetchall()
-            if result:
-                ret_data = dictify({
-                    item[1]: {
-                        "account_id": item[0],
-                        "max_limit": item[2],
-                        "balance": item[3]
-                    }
-                    for item in result
-                })
-                return jsonify(ret_data), 200
-            else:
-                return jsonify({"Error": f"Invalid account ID given {account_id}"}), 400
+    if request.method == 'GET':
+        with conn:
+            with conn.cursor() as curs:
+                query = "SELECT * FROM accounts WHERE account_num = %s"
+                curs.execute(query, (account_id,))
+                result = curs.fetchall()
+                if result:
+                    ret_data = dictify({
+                        item[1]: {
+                            "account_id": item[0],
+                            "max_limit": item[2],
+                            "balance": item[3]
+                        }
+                        for item in result
+                    })
+                    return jsonify(ret_data), 200
+                else:
+                    return jsonify({"Error": f"Invalid account ID given {account_id}"}), 400
+
+    if request.method == 'DELETE':
+        with conn:
+            with conn.cursor() as curs:
+                query = "SELECT * FROM customers_accounts WHERE account_id = %s"
+                curs.execute(query, (account_id,))
+                if curs.rowcount == 0:
+                    return jsonify({"Error": f"Invalid account ID {account_id}"})
+                query = "DELETE FROM customers_accounts WHERE account_id = %s"
+                curs.execute(query, (account_id,))
+                if curs.rowcount > 0:
+                    query = "DELETE FROM accounts WHERE id = %s"
+                    curs.execute(query, (account_id,))
+                    if curs.rowcount > 0:
+                        return jsonify({"Success": f"Account ID {account_id} was deleted"})
+                else:
+                    return jsonify({"Error": "Database error"}), 500
 
 
 # Get all accounts data;
