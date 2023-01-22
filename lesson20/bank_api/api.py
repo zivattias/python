@@ -350,5 +350,107 @@ def deposit(account_id):
                                                    f"account {account_id} has been completed!"})
 
 
+# Withdraw from account - amount & initiator passport_num in form data
+@app.route('/api/v1/accounts/<int:account_id>/withdraw', methods=['POST'])
+def withdraw(account_id):
+    if request.method == 'POST':
+        account_id = account_id
+        amount = request.form.get('amount')
+        initiated_by = request.form.get('passport_num')
+        if not initiated_by or not deposit:
+            return jsonify({"Error": "Can't complete withdrawal without amount and passport number"})
+
+        try:
+            amount = int(amount)
+            initiated_by = int(initiated_by)
+            if amount <= 0:
+                return jsonify({"Error": "Withdrawal amount must be positive"})
+        except ValueError:
+            return jsonify({"Error": "Withdrawal amount & passport number must be integers"})
+
+        query = "SELECT customers.passport_num FROM customers_accounts " \
+                "LEFT JOIN customers ON customers_accounts.customer_id = customers.id WHERE account_id = %s"
+        with conn:
+            with conn.cursor() as curs:
+                curs.execute(query, (account_id,))
+                valid_passports = [num[0] for num in curs.fetchall()]
+                if initiated_by not in valid_passports:
+                    return jsonify({"Error": f"Invalid passport number {initiated_by} for account {account_id}"})
+                curs.execute(f"SELECT balance, max_limit FROM accounts WHERE id = {account_id}")
+                balance, max_limit = curs.fetchone()
+                if balance - amount <= max_limit:
+                    return jsonify({"Error": "Insufficient credit for provided amount"})
+                else:
+                    query = "SELECT id FROM customers WHERE passport_num = %s"
+                    curs.execute(query, (initiated_by,))
+                    customer_id = curs.fetchone()[0]
+                    curs.execute(f"INSERT INTO transactions (trans_type, ts, initiator_id) "
+                                 f"VALUES ('withdraw', '{datetime.utcnow()}', {customer_id})")
+                    curs.execute("SELECT last_value FROM transactions_id_seq")
+                    transaction_id = int(curs.fetchone()[0])
+                    if curs.rowcount == 1:
+                        curs.execute("INSERT INTO transactions_accounts (account_role, transaction_id, account_id)"
+                                     f" VALUES ('self', {transaction_id}, {account_id})")
+                        curs.execute(f"UPDATE accounts SET balance = balance - {amount} WHERE id = {account_id}")
+                        if curs.rowcount == 1:
+                            return jsonify({"Success": f"Transaction {transaction_id} (withdrawal) for "
+                                                       f"account {account_id} has been completed!"})
+
+
+# Transfer from one account to another - amount, to_account, passport_num in form data
+@app.route('/api/v1/accounts/<int:account_id>/transfer', methods=['POST'])
+def transfer(account_id):
+    if request.method == 'POST':
+        from_account = account_id
+        to_account = request.form.get('to_account')
+        amount = request.form.get('amount')
+        passport_num = request.form.get('passport_num')
+
+        if not to_account or not amount or not passport_num:
+            return jsonify({"Error": "Can't execute transfer without all fields filled"}), 400
+
+        try:
+            amount, passport_num, to_account = int(amount), int(passport_num), int(to_account)
+            if amount <= 0:
+                return jsonify({"Error": "Transfer amount is less than or equals to 0"}), 400
+        except ValueError:
+            return jsonify({"Error": "One or more fields are not integers"}), 400
+
+        with conn:
+            with conn.cursor() as curs:
+                query = "SELECT * FROM accounts WHERE id = %s"
+                curs.execute(query, (to_account,))
+                if curs.rowcount == 0:
+                    return jsonify({"Error": f"Account ID {to_account} not found"})
+                query = "SELECT customers.passport_num FROM customers_accounts " \
+                        "LEFT JOIN customers ON customers_accounts.customer_id = customers.id WHERE account_id = %s"
+                curs.execute(query, (from_account,))
+                valid_passports = [num[0] for num in curs.fetchall()]
+                if passport_num not in valid_passports:
+                    return jsonify({"Error": f"Invalid passport number {passport_num} for account {from_account}"})
+                curs.execute(f"SELECT balance FROM accounts WHERE id = {from_account}")
+                balance = curs.fetchone()[0]
+                if balance < amount:
+                    return jsonify({"Error": "Insufficient funds in originating account"})
+
+                query = "SELECT id FROM customers WHERE passport_num = %s"
+                curs.execute(query, (passport_num,))
+                customer_id = curs.fetchone()[0]
+                curs.execute("INSERT INTO transactions(trans_type, ts, initiator_id) "
+                             f"VALUES ('transfer', '{datetime.now()}', {customer_id})")
+
+                curs.execute("SELECT last_value FROM transactions_id_seq")
+                trans_id = curs.fetchone()[0]
+
+                curs.execute("INSERT INTO transactions_accounts(account_role, account_id, transaction_id)"
+                             f"VALUES ('receiver', {to_account}, {trans_id})")
+                curs.execute("INSERT INTO transactions_accounts(account_role, account_id, transaction_id)"
+                             f"VALUES ('sender', {from_account}, {trans_id})")
+
+                curs.execute(f"UPDATE accounts SET balance = balance - {amount} WHERE id = {from_account}")
+                curs.execute(f"UPDATE accounts SET balance = balance + {amount} WHERE id = {to_account}")
+                return jsonify({"Success": "Transfer completed"}), 200
+
+
 if __name__ == '__main__':
     app.run(port=3000)
