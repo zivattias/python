@@ -224,35 +224,38 @@ def get_account_by_id(account_id):
             else:
                 return jsonify({"Error": f"Invalid account ID given {account_id}"}), 400
 
-# Get all accounts data
-# Filtering by balance and/or max_limit allowed
-@app.route('/api/v1/accounts')
+
+# Get all accounts data;
+# Filtering by balance and/or max_limit allowed.
+# Create a new account given account_num, max_limit & account owners (customer_ids) in form data
+@app.route('/api/v1/accounts', methods=['GET', 'POST'])
 def get_all_accounts():
-    balance = request.args.get('balance')
-    max_limit = request.args.get('max_limit')
+    if request.method == 'GET':
+        balance = request.args.get('balance')
+        max_limit = request.args.get('max_limit')
 
-    conditions = list()
-    params = list()
+        conditions = list()
+        params = list()
 
-    if balance:
-        conditions.append("balance = %s")
-        params.append(balance)
+        if balance:
+            conditions.append("balance = %s")
+            params.append(balance)
 
-    if max_limit:
-        conditions.append("max_limit = %s")
-        params.append(max_limit)
+        if max_limit:
+            conditions.append("max_limit = %s")
+            params.append(max_limit)
 
-    query = "SELECT * FROM accounts"
-    if conditions:
-        query += " WHERE " + " AND ".join(conditions)
+        query = "SELECT * FROM accounts"
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
 
-    with conn:
-        with conn.cursor() as curs:
-            curs.execute(query, params)
-            result = curs.fetchall()
-            if not result:
-                return jsonify({"Error": "No accounts found for given query params"}), 404
-            ret_data = dictify({
+        with conn:
+            with conn.cursor() as curs:
+                curs.execute(query, params)
+                result = curs.fetchall()
+                if not result:
+                    return jsonify({"Error": "No accounts found for given query params"}), 404
+                ret_data = dictify({
                     item[1]: {
                         "account_id": item[0],
                         "max_limit": item[2],
@@ -260,8 +263,46 @@ def get_all_accounts():
                     }
                     for item in result
                 })
-            return jsonify(ret_data), 200
+                return jsonify(ret_data), 200
+
+    if request.method == 'POST':
+        account_num = request.form.get('account_num')
+        max_limit = request.form.get('max_limit')
+        base_owners = request.form.get('account_owners').strip()
+        if base_owners.count(',') > 0:
+            flag = True
+            try:
+                int(base_owners.replace(' ', '').replace(',', ''))
+            except ValueError:
+                return jsonify({"Error": "Account owner IDs must be integers"}), 400
+        else:
+            flag = False
+            try:
+                int(base_owners)
+            except ValueError:
+                return jsonify({"Error": "Account owner ID must be an integer"}), 400
+
+        account_owners = base_owners.replace(' ', '').split(',') if flag else list(base_owners)
+
+        account_creation = 'INSERT INTO accounts (account_num, max_limit, balance) VALUES (%s, %s, 0)'
+        account_connection = 'INSERT INTO customers_accounts (account_id, customer_id) VALUES (%s, %s)'
+
+        with conn:
+            with conn.cursor() as curs:
+                curs.execute(account_creation, (account_num, max_limit))
+                if curs.rowcount == 1:
+                    curs.execute("SELECT last_value FROM accounts_id_seq")
+                    account_id = curs.fetchone()[0]
+                    counter = 0
+                    for owner in account_owners:
+                        curs.execute(account_connection, (account_id, owner))
+                        counter += 1 if curs.rowcount == 1 else 0
+                    if counter == len(account_owners):
+                        return jsonify({"Success": f"Account {account_id} created:"
+                                                   f" {account_num, max_limit, account_owners}"})
+                else:
+                    return jsonify({"Error": "Couldn't create account with given form data"}), 400
 
 
 if __name__ == '__main__':
-    app.run(port=3000, debug=True)
+    app.run(port=3000)
