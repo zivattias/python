@@ -66,16 +66,20 @@ def get_all_customers_wet():
                 curs.execute(query, params)
                 result = curs.fetchall()
                 if result:
-                    ret_data = dictify({
-                        'customer_id': {
-                            item[0]: {
-                                'passport_num': item[1],
-                                'fullname': item[2],
-                                'address': item[3],
-                                'account_id': item[4]
+                    ret_data = dict()
+                    for item in result:
+                        if item[1] not in ret_data:
+                            ret_data[item[1]] = {
+                                "customer_id": item[0],
+                                "fullname": item[2],
+                                "address": item[3],
+                                "account_id": [item[4]]
                             }
-                            for item in result
-                        }
+                        else:
+                            ret_data[item[1]]['account_id'].append(item[4])
+
+                    ret_data = dictify({
+                        "passport_num": ret_data
                     })
                     return jsonify(ret_data), 200
                 else:
@@ -320,7 +324,7 @@ def deposit(account_id):
             if amount <= 0:
                 return jsonify({"Error": "Deposit amount must be positive"})
         except ValueError:
-            return jsonify({"Error": "Deposit amount must be an integer"})
+            return jsonify({"Error": "Deposit amount & passport number must be integers"})
 
         query = "SELECT customers.passport_num FROM customers_accounts " \
                 "LEFT JOIN customers ON customers_accounts.customer_id = customers.id WHERE account_id = %s"
@@ -335,14 +339,12 @@ def deposit(account_id):
                 customer_id = curs.fetchone()[0]
                 curs.execute(f"INSERT INTO transactions (trans_type, ts, initiator_id) "
                              f"VALUES ('deposit', '{datetime.utcnow()}', {customer_id})")
-
-        with conn:
-            with conn.cursor() as curs:
                 curs.execute("SELECT last_value FROM transactions_id_seq")
-                transaction_id = int(curs.fetchone()[0]) + 1
+                transaction_id = int(curs.fetchone()[0])
                 if curs.rowcount == 1:
                     curs.execute("INSERT INTO transactions_accounts (account_role, transaction_id, account_id)"
                                  f" VALUES ('self', {transaction_id}, {account_id})")
+                    curs.execute(f"UPDATE accounts SET balance = balance + {amount} WHERE id = {account_id}")
                     if curs.rowcount == 1:
                         return jsonify({"Success": f"Transaction {transaction_id} (deposit) for "
                                                    f"account {account_id} has been completed!"})
